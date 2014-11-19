@@ -161,7 +161,7 @@ static int chksumc_final(struct shash_desc *desc, u8 *out)
 
 static int __chksum_finup(u32 crc, const u8 *data, unsigned int len, u8 *out)
 {
-	put_unaligned_le32(crc32_arm64_le_hw(crc, data, len), out);
+	put_unaligned_le32(~crc32_arm64_le_hw(crc, data, len), out);
 	return 0;
 }
 
@@ -245,7 +245,7 @@ static struct shash_alg crc32c_alg = {
 	.setkey			=	chksum_setkey,
 	.init			=	chksum_init,
 	.update			=	chksumc_update,
-	.final			=	chksumc_final,
+	.final			=	chksum_final,
 	.finup			=	chksumc_finup,
 	.digest			=	chksumc_digest,
 	.descsize		=	sizeof(struct chksum_desc_ctx),
@@ -257,7 +257,7 @@ static struct shash_alg crc32c_alg = {
 		.cra_alignmask		=	0,
 		.cra_ctxsize		=	sizeof(struct chksum_ctx),
 		.cra_module		=	THIS_MODULE,
-		.cra_init		=	crc32c_cra_init,
+		.cra_init		=	crc32_cra_init,
 	}
 };
 
