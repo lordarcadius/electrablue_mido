@@ -7991,6 +7991,7 @@ long __sched io_schedule_timeout(long timeout)
 	int old_iowait = current->in_iowait;
 	struct rq *rq;
 	long ret;
+	blk_schedule_flush_plug(current);
 
 	current->in_iowait = 1;
 	blk_schedule_flush_plug(current);
