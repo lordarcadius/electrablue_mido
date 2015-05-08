@@ -7998,6 +7998,7 @@ long __sched io_schedule_timeout(long timeout)
 {
 	struct rq *rq = raw_rq();
 	long ret;
+	blk_schedule_flush_plug(current);
 
 	delayacct_blkio_start();
 	atomic_inc(&rq->nr_iowait);
