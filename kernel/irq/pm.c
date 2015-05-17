@@ -118,6 +118,8 @@ void suspend_device_irqs(void)
 		unsigned long flags;
 		bool sync;
 
+		if (irq_settings_is_nested_thread(desc))
+			continue;
 		raw_spin_lock_irqsave(&desc->lock, flags);
 		sync = suspend_device_irq(desc, irq);
 		raw_spin_unlock_irqrestore(&desc->lock, flags);
@@ -157,6 +159,8 @@ static void resume_irqs(bool want_early)
 			desc->action->flags & IRQF_EARLY_RESUME;
 
 		if (!is_early && want_early)
+			continue;
+		if (irq_settings_is_nested_thread(desc))
 			continue;
 
 		raw_spin_lock_irqsave(&desc->lock, flags);
