@@ -22,7 +22,7 @@ struct zpool {
 
 	struct zpool_driver *driver;
 	void *pool;
-	struct zpool_ops *ops;
+	const struct zpool_ops *ops;
 
 	struct list_head list;
 };
@@ -148,7 +148,7 @@ EXPORT_SYMBOL(zpool_has_pool);
  * Returns: New zpool on success, NULL on failure.
  */
 struct zpool *zpool_create_pool(char *type, char *name, gfp_t gfp,
-		struct zpool_ops *ops)
+		const struct zpool_ops *ops)
 {
 	struct zpool_driver *driver;
 	struct zpool *zpool;
