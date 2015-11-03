@@ -20,6 +20,7 @@
 #include <linux/of_platform.h>
 #include <linux/platform_device.h>
 #include <linux/slab.h>
+#include <linux/pm_qos.h>
 #include <linux/types.h>
 #include <linux/version.h>
 #include <linux/io.h>
