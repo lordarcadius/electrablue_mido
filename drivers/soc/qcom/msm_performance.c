@@ -27,6 +27,8 @@
 #include <linux/kthread.h>
 
 static unsigned int use_input_evts_with_hi_slvt_detect;
+static int touchboost = 1;
+
 static struct mutex managed_cpus_lock;
 
 
@@ -379,6 +381,11 @@ static int set_cpu_min_freq(const char *buf, const struct kernel_param *kp)
 	cpumask_var_t limit_mask;
 	int ret;
 
+	const char *reset = "0:0 4:0";
+
+	if (touchboost == 0)
+		cp = reset;
+
 	while ((cp = strpbrk(cp + 1, " :")))
 		ntokens++;
 
@@ -386,7 +393,11 @@ static int set_cpu_min_freq(const char *buf, const struct kernel_param *kp)
 	if (!(ntokens % 2))
 		return -EINVAL;
 
-	cp = buf;
+	if (touchboost == 0)
+		cp = reset;
+	else
+		cp = buf;
+
 	cpumask_clear(limit_mask);
 	for (i = 0; i < ntokens; i += 2) {
 		if (sscanf(cp, "%u:%u", &cpu, &val) != 2)
