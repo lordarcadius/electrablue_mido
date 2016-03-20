@@ -934,6 +934,9 @@ config SERIAL_NUM
 	help
 	  Provide a interface for reading CPU serial number
 
+config STATE_NOTIFIER
+        bool "State Notifier"
+
 source "drivers/soc/qcom/memshare/Kconfig"
 
 endif # ARCH_MSM
