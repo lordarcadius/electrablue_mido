@@ -189,6 +189,7 @@ struct irq_data {
  * IRQD_IRQ_MASKED		- Masked state of the interrupt
  * IRQD_IRQ_INPROGRESS		- In progress state of the interrupt
  * IRQD_WAKEUP_ARMED		- Wakeup mode armed
+ * IRQD_AFFINITY_MANAGED	- Affinity is auto-managed by the kernel
  */
 enum {
 	IRQD_TRIGGER_MASK		= 0xf,
@@ -203,6 +204,7 @@ enum {
 	IRQD_IRQ_MASKED			= (1 << 17),
 	IRQD_IRQ_INPROGRESS		= (1 << 18),
 	IRQD_WAKEUP_ARMED		= (1 << 19),
+	IRQD_AFFINITY_MANAGED		= (1 << 20),
 };
 
 #define __irqd_to_state(d)		((d)->common->state_use_accessors)
@@ -281,6 +283,10 @@ static inline bool irqd_is_wakeup_armed(struct irq_data *d)
 	return __irqd_to_state(d) & IRQD_WAKEUP_ARMED;
 }
 
+static inline bool irqd_affinity_is_managed(struct irq_data *d)
+{
+	return __irqd_to_state(d) & IRQD_AFFINITY_MANAGED;
+}
 
 /*
  * Functions for chained handlers which can be enabled/disabled by the
