@@ -42,12 +42,12 @@ struct kgsl_context;
  * @waiting: Workqueue structure for contexts waiting for a timestamp or event
  * @timeout: Workqueue structure for contexts waiting to invalidate
  * @queued: Number of commands queued in the drawqueue
- * @fault_policy: GFT fault policy set in drawobj_skip_cmd();
+ * @fault_policy: GFT fault policy set in _skip_cmd();
  * @debug_root: debugfs entry for this context.
  * @queued_timestamp: The last timestamp that was queued on this context
  * @rb: The ringbuffer in which this context submits commands.
  * @submitted_timestamp: The last timestamp that was submitted for this context
- * @submit_retire_ticks: Array to hold drawobj execution times from submit
+ * @submit_retire_ticks: Array to hold command obj execution times from submit
  *                       to retire
  * @ticks_index: The index into submit_retire_ticks[] where the new delta will
  *		 be written.
@@ -95,8 +95,9 @@ struct adreno_context {
  * @ADRENO_CONTEXT_SKIP_EOF - Context skip IBs until the next end of frame
  *      marker.
  * @ADRENO_CONTEXT_FORCE_PREAMBLE - Force the preamble for the next submission.
- * @ADRENO_CONTEXT_SKIP_CMD - Context's drawobj is skipped during
+ * @ADRENO_CONTEXT_SKIP_CMD - Context's drawobj's skipped during
 	fault tolerance.
+ * @ADRENO_CONTEXT_FENCE_LOG - Dump fences on this context.
  */
 enum adreno_context_priv {
 	ADRENO_CONTEXT_FAULT = KGSL_CONTEXT_PRIV_DEVICE_SPECIFIC,
@@ -105,6 +106,7 @@ enum adreno_context_priv {
 	ADRENO_CONTEXT_SKIP_EOF,
 	ADRENO_CONTEXT_FORCE_PREAMBLE,
 	ADRENO_CONTEXT_SKIP_CMD,
+	ADRENO_CONTEXT_FENCE_LOG,
 };
 
 /* Flags for adreno_drawctxt_switch() */
