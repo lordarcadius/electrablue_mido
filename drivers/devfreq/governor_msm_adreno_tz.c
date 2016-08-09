@@ -419,7 +419,8 @@ static int tz_get_target_freq(struct devfreq *devfreq, unsigned long *freq,
 
 #if 1
 	// scale busy time up based on adrenoboost parameter, only if MIN_BUSY exceeded...
-	if ((unsigned int)(priv->bin.busy_time + stats.busy_time) >= MIN_BUSY && adrenoboost) {
+//	if ((unsigned int)(priv->bin.busy_time + stats.busy_time) >= MIN_BUSY && adrenoboost) {
+	if (adrenoboost) {
 		if (adrenoboost == 1) {
 			priv->bin.busy_time += (unsigned int)((stats.busy_time * ( 1 + adrenoboost ) * lvl_multiplicator_map_1[ last_level ]) / lvl_divider_map_1[ last_level ]);
 		} else
@@ -477,8 +478,10 @@ static int tz_get_target_freq(struct devfreq *devfreq, unsigned long *freq,
 		__secure_tz_update_entry3(scm_data, sizeof(scm_data),
 					&val, sizeof(val), priv);
 	}
+#if 0
 	priv->bin.total_time = 0;
 	priv->bin.busy_time = 0;
+#endif
 
 	/*
 	 * If the decision is to move to a different level, make sure the GPU
@@ -488,7 +491,40 @@ static int tz_get_target_freq(struct devfreq *devfreq, unsigned long *freq,
 		level += val;
 		level = max(level, 0);
 		level = min_t(int, level, devfreq->profile->max_state - 1);
+		printk("%s ADRENO jumping level = %d last_level = %d total=%d busy=%d original busy_time=%d \n", __func__, level, priv->bin.last_level, (int)priv->bin.total_time, (int)priv->bin.busy_time, (int)stats.busy_time);
+		priv->bin.last_level = level;
+	} else {
+		if (val) {
+			priv->bin.cycles_keeping_level += 1 + abs(val/2); // higher value change quantity means more addition to cycles_keeping_level for easier switching
+			// going upwards in frequency -- make it harder on the low and high freqs, middle ground - let it move
+			if (val<0 && priv->bin.cycles_keeping_level < conservation_map_up[ last_level ]) {
+				printk("%s ADRENO not jumping UP level = %d last_level = %d total=%d busy=%d original busy_time=%d \n", __func__, level, priv->bin.last_level, (int)priv->bin.total_time, (int)priv->bin.busy_time, (int)stats.busy_time);
+			} else
+			// going downwards in frequency let it happen hard in the middle freqs
+			if (val>0 && priv->bin.cycles_keeping_level < conservation_map_down[ last_level ])  {
+				printk("%s ADRENO not jumping DOWN level = %d last_level = %d total=%d busy=%d original busy_time=%d \n", __func__, level, priv->bin.last_level, (int)priv->bin.total_time, (int)priv->bin.busy_time, (int)stats.busy_time);
+			} else
+			{
+				level += val;
+				level = max(level, 0);
+				level = min_t(int, level, devfreq->profile->max_state - 1);
+				// reset keep cylcles timer
+				priv->bin.cycles_keeping_level = 0;
+				// set new last level
+				priv->bin.last_level = level;
+				printk("%s ADRENO jumping level = %d last_level = %d total=%d busy=%d original busy_time=%d \n", __func__, level, priv->bin.last_level, (int)priv->bin.total_time, (int)priv->bin.busy_time, (int)stats.busy_time);
+			}
+		}
 	}
+	priv->bin.total_time = 0;
+	priv->bin.busy_time = 0;
+#else
+	if (val) {
+		level += val;
+		level = max(level, 0);
+		level = min_t(int, level, devfreq->profile->max_state - 1);
+	}
+#endif
 
 	*freq = devfreq->profile->freq_table[level];
 	return 0;
@@ -572,6 +608,10 @@ static int tz_start(struct devfreq *devfreq)
 
 	for (i = 0; adreno_tz_attr_list[i] != NULL; i++)
 		device_create_file(&devfreq->dev, adreno_tz_attr_list[i]);
+
+#if 1
+	priv->bin.last_level = devfreq->profile->max_state - 1;
+#endif
 
 	return kgsl_devfreq_add_notifier(devfreq->dev.parent, &priv->nb);
 }
