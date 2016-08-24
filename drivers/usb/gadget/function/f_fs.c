@@ -19,6 +19,7 @@
 /* #define VERBOSE_DEBUG */
 
 #include <linux/blkdev.h>
+#include <linux/freezer.h>
 #include <linux/pagemap.h>
 #include <linux/export.h>
 #include <linux/hid.h>
@@ -750,7 +751,7 @@ retry:
 		 * and wait for next epfile open to happen
 		 */
 		if (!atomic_read(&epfile->error)) {
-			ret = wait_event_interruptible(epfile->wait,
+			ret = wait_event_freezable(epfile->wait,
 					(ep = epfile->ep));
 			if (ret < 0)
 				goto error;
