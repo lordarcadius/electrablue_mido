@@ -606,7 +606,6 @@ config FORCE_FAST_CHARGE
 	help
 	  This allows users to override default charge rate for USB
 
-
 source "drivers/misc/c2port/Kconfig"
 source "drivers/misc/eeprom/Kconfig"
 source "drivers/misc/cb710/Kconfig"
