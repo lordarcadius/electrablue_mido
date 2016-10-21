@@ -48,14 +48,6 @@ static void remove_safetynet_flags(char *cmd)
 
 static int __init proc_cmdline_init(void)
 {
-	strcpy(new_command_line, saved_command_line);
-
-	/*
-	 * Remove various flags from command line seen by userspace in order to
-	 * pass SafetyNet CTS check.
-	 */
-	remove_safetynet_flags(new_command_line);
-
 	char *offset_addr, *cmd = new_command_line;
 
 	strcpy(cmd, saved_command_line);
