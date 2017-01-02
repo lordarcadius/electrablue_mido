@@ -135,7 +135,7 @@ static void kgsl_iommu_unmap_globals(struct kgsl_pagetable *pagetable)
 	}
 }
 
-static void kgsl_iommu_map_globals(struct kgsl_pagetable *pagetable)
+static int kgsl_iommu_map_globals(struct kgsl_pagetable *pagetable)
 {
 	unsigned int i;
 
@@ -144,9 +144,11 @@ static void kgsl_iommu_map_globals(struct kgsl_pagetable *pagetable)
 			int ret = kgsl_mmu_map(pagetable,
 					global_pt_entries[i].memdesc);
 
-			BUG_ON(ret);
+			if (ret)
+				return ret;
 		}
 	}
+	return 0;
 }
 
 static void kgsl_iommu_unmap_global_secure_pt_entry(struct kgsl_pagetable
@@ -159,16 +161,16 @@ static void kgsl_iommu_unmap_global_secure_pt_entry(struct kgsl_pagetable
 
 }
 
-static void kgsl_map_global_secure_pt_entry(struct kgsl_pagetable *pagetable)
+static int kgsl_map_global_secure_pt_entry(struct kgsl_pagetable *pagetable)
 {
-	int ret;
+	int ret = 0;
 	struct kgsl_memdesc *entry = kgsl_global_secure_pt_entry;
 
 	if (entry != NULL) {
 		entry->pagetable = pagetable;
 		ret = kgsl_mmu_map(pagetable, entry);
-		BUG_ON(ret);
 	}
+	return ret;
 }
 
 static void kgsl_iommu_remove_global(struct kgsl_mmu *mmu,
@@ -1173,7 +1175,7 @@ static int _init_global_pt(struct kgsl_mmu *mmu, struct kgsl_pagetable *pt)
 		goto done;
 	}
 
-	kgsl_iommu_map_globals(pt);
+	ret = kgsl_iommu_map_globals(pt);
 
 done:
 	if (ret)
@@ -1233,7 +1235,7 @@ static int _init_secure_pt(struct kgsl_mmu *mmu, struct kgsl_pagetable *pt)
 	ctx->regbase = iommu->regbase + KGSL_IOMMU_CB0_OFFSET
 			+ (cb_num << KGSL_IOMMU_CB_SHIFT);
 
-	kgsl_map_global_secure_pt_entry(pt);
+	ret = kgsl_map_global_secure_pt_entry(pt);
 
 done:
 	if (ret)
@@ -1298,7 +1300,7 @@ static int _init_per_process_pt(struct kgsl_mmu *mmu, struct kgsl_pagetable *pt)
 		goto done;
 	}
 
-	kgsl_iommu_map_globals(pt);
+	ret = kgsl_iommu_map_globals(pt);
 
 done:
 	if (ret)
