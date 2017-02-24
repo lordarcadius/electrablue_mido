@@ -81,6 +81,7 @@ struct kgsl_mmu_ops {
 	struct kgsl_pagetable * (*mmu_getpagetable)(struct kgsl_mmu *mmu,
 			unsigned long name);
 	struct kgsl_memdesc* (*mmu_get_qdss_global_entry)(void);
+	struct kgsl_memdesc* (*mmu_get_qtimer_global_entry)(void);
 };
 
 struct kgsl_mmu_pt_ops {
@@ -229,6 +230,9 @@ int kgsl_mmu_unmap_offset(struct kgsl_pagetable *pagetable,
 		uint64_t size);
 
 struct kgsl_memdesc *kgsl_mmu_get_qdss_global_entry(struct kgsl_device *device);
+
+struct kgsl_memdesc *kgsl_mmu_get_qtimer_global_entry(
+		struct kgsl_device *device);
 
 /*
  * Static inline functions of MMU that simply call the SMMU specific
