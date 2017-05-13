@@ -179,6 +179,14 @@ config CPU_FREQ_DEFAULT_GOV_CHILL
 	  governor. If unsure have a look at the help section of the
 	  driver. Fallback governor will be the interactive governor.
 
+config CPU_FREQ_DEFAULT_GOV_ELECTRON
+	bool "electron"
+	select CPU_FREQ_GOV_ELECTRON
+	help
+	  Use the CPUFreq governor 'electron' as default. This allows
+	  you to get a full dynamic cpu frequency capable system by simply
+	  loading your cpufreq low-level hardware driver, using the
+	  'electron' governor for latency-sensitive workloads.
 endchoice
 
 config CPU_FREQ_GOV_PERFORMANCE
@@ -304,6 +312,12 @@ config CPU_FREQ_GOV_RELAXED
 	help
 	  'relaxed' - similar to 'conservative', but optimized for devices
 	  that go into suspended or display off states often.
+
+config CPU_FREQ_GOV_ELECTRON
+	tristate "'electron' cpufreq governor"
+	depends on CPU_FREQ
+	help
+	  'electron' - another tuned interactive with extra options
 
 config CPU_BOOST
 	tristate "Event base short term CPU freq boost"
