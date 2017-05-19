@@ -4473,3 +4473,4 @@ module_exit(ft5435_ts_exit);
 
 MODULE_DESCRIPTION("FocalTech ft5435 TouchScreen driver");
 MODULE_LICENSE("GPL v2");
+

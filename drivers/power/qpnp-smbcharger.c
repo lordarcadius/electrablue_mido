@@ -4911,8 +4911,10 @@ static int smbchg_restricted_charging(struct smbchg_chip *chip, bool enable)
 
 	return rc;
 }
+
 extern void ist30xx_set_ta_mode(bool mode);
 extern void tpd_usb_plugin(bool mode);
+extern void gtp_usb_plugin(bool mode);
 int set_usb_charge_mode_par = 0;
 static void handle_usb_removal(struct smbchg_chip *chip)
 {
@@ -4923,8 +4925,9 @@ static void handle_usb_removal(struct smbchg_chip *chip)
 		ist30xx_set_ta_mode(0);
 	} else if (set_usb_charge_mode_par == 2) {
 		tpd_usb_plugin(0);
+	} else if (set_usb_charge_mode_par == 3) {
+		gtp_usb_plugin(0);
 	}
-printk("set_usb_charge_mode_par off = %d\n", set_usb_charge_mode_par);
 	pr_smb(PR_STATUS, "triggered\n");
 	smbchg_aicl_deglitch_wa_check(chip);
 	/* Clear the OV detected status set before */
@@ -5001,10 +5004,13 @@ static void handle_usb_insertion(struct smbchg_chip *chip)
 	enum power_supply_type usb_supply_type;
 	int rc;
 	char *usb_type_name = "null";
+
 	if (set_usb_charge_mode_par == 1) {
 		ist30xx_set_ta_mode(1);
 	} else if (set_usb_charge_mode_par == 2) {
 		tpd_usb_plugin(1);
+	} else if (set_usb_charge_mode_par == 3) {
+		gtp_usb_plugin(1);
 	}
 	pr_smb(PR_STATUS, "triggered\n");
 	/* usb inserted */

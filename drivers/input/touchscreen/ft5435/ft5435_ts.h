@@ -97,3 +97,4 @@ struct ft5435_rawdata_test_result {
 	int index[350][3];
 };
 #endif
+
