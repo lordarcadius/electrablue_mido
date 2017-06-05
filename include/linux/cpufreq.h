@@ -676,10 +676,13 @@ int cpufreq_generic_init(struct cpufreq_policy *policy,
 void cpufreq_task_stats_init(struct task_struct *p);
 void cpufreq_task_stats_exit(struct task_struct *p);
 int proc_time_in_state_show(struct seq_file *m, struct pid_namespace *ns,
-			     struct pid *pid, struct task_struct *p);
+	struct pid *pid, struct task_struct *p);
+void cpufreq_task_stats_remove_uids(uid_t uid_start, uid_t uid_end);
 #else
 static inline void cpufreq_task_stats_init(struct task_struct *p) {}
 static inline void cpufreq_task_stats_exit(struct task_struct *p) {}
+static inline void cpufreq_task_stats_remove_uids(uid_t uid_start,
+	uid_t uid_end) {}
 #endif
 
 struct sched_domain;
