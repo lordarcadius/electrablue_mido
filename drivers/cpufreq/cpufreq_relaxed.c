@@ -14,7 +14,7 @@
 
 #include <linux/slab.h>
 #include "cpufreq_governor.h"
-#include <linux/display_state.h>
+#include <linux/state_notifier.h>
 #include <linux/err.h>
 
 /* Relaxed version macros */
@@ -64,11 +64,8 @@ static void cs_check_cpu(int cpu, unsigned int load)
 	struct dbs_data *dbs_data = policy->governor_data;
 	struct cs_dbs_tuners *cs_tuners = dbs_data->tuners;
 
-	/* Create display state boolean */
-	bool display_on = is_display_on();
-
 	/* Once min frequency is reached while screen off, stop taking load samples*/
-	if (!display_on && policy->cur == policy->min)
+	if (state_suspended && policy->cur == policy->min)
 		return;
 
 	/*
@@ -79,7 +76,7 @@ static void cs_check_cpu(int cpu, unsigned int load)
 		return;
 
 	/* Check for frequency decrease */
-	if (display_on && load < cs_tuners->down_threshold) {
+	if (!state_suspended && load < cs_tuners->down_threshold) {
 		unsigned int freq_target;
 		/*
 		 * if we cannot reduce the frequency anymore, break out early
@@ -101,7 +98,7 @@ static void cs_check_cpu(int cpu, unsigned int load)
 		__cpufreq_driver_target(policy, dbs_info->requested_freq,
 				CPUFREQ_RELATION_L);
 		return;
-	} else if (!display_on && load <= cs_tuners->down_threshold_suspended) {
+	} else if (state_suspended && load <= cs_tuners->down_threshold_suspended) {
 		unsigned int freq_target;
 		/*
 		 * if we cannot reduce the frequency anymore, break out early
@@ -130,7 +127,7 @@ static void cs_check_cpu(int cpu, unsigned int load)
 			return;
 
 		/* if display is off then break out early */
-		if (!display_on)
+		if (state_suspended)
 			return;
 
 		/* Boost if count is reached, otherwise increase freq */
