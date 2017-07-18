@@ -165,7 +165,7 @@ struct cpufreq_interactive_tunables {
 	bool powersave_bias;
 
 	/* Maximum frequency while the screen is off */
-#define DEFAULT_SCREEN_OFF_MAX 1286400
+#define DEFAULT_SCREEN_OFF_MAX 1401600
 	unsigned long screen_off_max;
 };
 
@@ -1459,7 +1459,7 @@ static ssize_t store_screen_off_maxfreq(
 	if (ret < 0)
 		return ret;
 
-	if (val < 384000)
+	if (val < 652800)
 		tunables->screen_off_max = DEFAULT_SCREEN_OFF_MAX;
 	else
 		tunables->screen_off_max = val;
