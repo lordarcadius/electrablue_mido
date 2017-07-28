@@ -72,6 +72,7 @@
 		qcom,idle-timeout = <80>; //msecs
 		qcom,deep-nap-timeout = <100>; //msecs
 		qcom,strtstp-sleepwake;
+    qcom,disable-wake-on-touch;
 
 		qcom,highest-bank-bit = <14>;
 
