@@ -4,6 +4,7 @@
 #
 
 # ElectraBlue
+CONFIG_STATE_NOTIFIER=y
 
 #
 # CPUQuiet Framework
