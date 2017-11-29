@@ -533,7 +533,6 @@ static int handle_alloc_generic_req(void *req_h, void *req, void *conn_h)
 		pr_err("In %s, Error sending the alloc request: %d\n",
 							__func__, rc);
 	
->>>>>>> b318c7c95a21... fix possible memory leak in memshare
 	kfree(alloc_resp);
 	alloc_resp = NULL;
 	return rc;
