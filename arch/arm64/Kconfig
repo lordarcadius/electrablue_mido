@@ -1106,6 +1106,4 @@ endif
 
 source "lib/Kconfig"
 
-source "drivers/cpuquiet/Kconfig"
-
 source "arch/arm64/mm/Kconfig"
