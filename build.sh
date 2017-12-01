@@ -35,6 +35,7 @@ export CROSS_COMPILE="/home/lordarcadius/aarch64-linaro-linux-android/bin/aarch6
 kernel="ElectraBlue"
 version="8.0"
 vendor="xiaomi"
+android="OREO"
 device="mido"
 zip=zip
 date=`date +"%Y%m%d-%H%M"`
@@ -43,7 +44,7 @@ kerneltype="Image.gz-dtb"
 jobcount="-j$(grep -c ^processor /proc/cpuinfo)"
 #modules_dir=$kernel_dir/"$zip"/system/lib/modules
 modules_dir=$kernel_dir/"$zip"/modules
-zip_name="$kernel"-"$version"-"$date"-"$device".zip
+zip_name="$kernel"-"$version"-"$date"-"$android"-"$device".zip
 export KBUILD_BUILD_USER=LordArcadius
 export KBUILD_BUILD_HOST=DroidBox
 
