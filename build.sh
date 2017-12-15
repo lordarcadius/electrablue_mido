@@ -129,7 +129,7 @@ if [ -f "$zip"/"$kerneltype" ]; then
 	cd ..
 	rm -rf arch/arm64/boot/"$kerneltype"
 	echo "Generating changelog..."
-        git --no-pager log --pretty=oneline --abbrev-commit 63940662c5bd707159770d06b4db10f6ee8b73af..HEAD > zip/changelog.txt
+        #git --no-pager log --pretty=oneline --abbrev-commit 63940662c5bd707159770d06b4db10f6ee8b73af..HEAD > zip/changelog.txt
         paste zip/changelog.txt
         #rm zip/changelog.txt
 	export outdir=""$build""
