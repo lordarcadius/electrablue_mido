@@ -82,7 +82,7 @@ MODULE_LICENSE("GPLv2");
 int s2w_switch = 0;
 bool s2w_scr_suspended = false;
 static int s2w_debug = 0;
-static int s2w_pwrkey_dur = 60;
+static int s2w_pwrkey_dur = 30;
 static int touch_x = 0, touch_y = 0;
 static bool touch_x_called = false, touch_y_called = false;
 static bool exec_count = true;
