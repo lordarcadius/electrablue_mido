@@ -247,7 +247,7 @@ static void s2w_input_event(struct input_handle *handle, unsigned int type,
 	if (touch_x_called && touch_y_called) {
 		touch_x_called = false;
 		touch_y_called = false;
-		queue_work_on(0, s2w_input_wq, &s2w_input_work);
+		queue_work(s2w_input_wq, &s2w_input_work);
 	}
 }
 
