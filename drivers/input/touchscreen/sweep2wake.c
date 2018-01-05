@@ -30,6 +30,7 @@
 #include <linux/workqueue.h>
 #include <linux/input.h>
 #include <linux/hrtimer.h>
+#include <linux/display_state.h>
 
 /* uncomment since no touchscreen defines android touch, do that here */
 //#define ANDROID_TOUCH_DECLARED
@@ -80,7 +81,6 @@ MODULE_LICENSE("GPLv2");
 
 /* Resources */
 int s2w_switch = 0;
-bool s2w_scr_suspended = false;
 static int s2w_debug = 0;
 static int s2w_pwrkey_dur = 30;
 static int touch_x = 0, touch_y = 0;
@@ -149,7 +149,7 @@ static void detect_sweep2wake(int x, int y)
 		pr_info(LOGTAG"x: %d, y: %d\n", x, y);
 
 	//left->right
-	if (s2w_scr_suspended == true) {
+	if (!is_display_on()) {
 		prevx = 0;
 		nextx = S2W_X_B1;
 		if ((barrier[0] == true) ||
@@ -178,7 +178,7 @@ static void detect_sweep2wake(int x, int y)
 			}
 		}
 	//right->left
-	} else if ((s2w_scr_suspended == false) && (s2w_switch > 0)) {
+	} else if ((is_display_on()) && (s2w_switch > 0)) {
 		scr_on_touch=true;
 		prevx = (S2W_X_MAX - S2W_X_FINAL);
 		nextx = S2W_X_B2;
@@ -221,7 +221,7 @@ static void s2w_input_callback(struct work_struct *unused) {
 static void s2w_input_event(struct input_handle *handle, unsigned int type,
 				unsigned int code, int value)
 {
-	if ((!s2w_switch) || ((s2w_scr_suspended) && (s2w_switch > 1)))
+	if ((!s2w_switch) || ((is_display_on()) && (s2w_switch > 1)))
 		return;
 
 	if (code == ABS_MT_SLOT) {
