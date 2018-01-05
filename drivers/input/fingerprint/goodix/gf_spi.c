@@ -45,6 +45,7 @@
 #include <linux/fb.h>
 #include <linux/pm_qos.h>
 #include <linux/cpufreq.h>
+#include <linux/display_state.h>
 
 #include "gf_spi.h"
 
@@ -345,8 +346,15 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 					input_report_key(gf_dev->input, KEY_SELECT, gf_key.value);
 					input_sync(gf_dev->input);
 				} else {
-					input_report_key(gf_dev->input, gf_key.key, gf_key.value);
-					input_sync(gf_dev->input);
+					if (!is_display_on()) {
+						sched_set_boost(1);
+						input_report_key(gf_dev->input, gf_key.key, gf_key.value);
+						input_sync(gf_dev->input);
+						sched_set_boost(0);
+					} else {
+						input_report_key(gf_dev->input, gf_key.key, gf_key.value);
+						input_sync(gf_dev->input);
+					}
 				}
 				break;
 			}
