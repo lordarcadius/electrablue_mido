@@ -71,12 +71,12 @@ MODULE_LICENSE("GPLv2");
 #define S2W_X_FINAL             450
 #else
 /* defaults */
-#define S2W_Y_MAX				1280
-#define S2W_X_MAX				720
-#define S2W_Y_LIMIT				S2W_Y_MAX-70
-#define S2W_X_B1				200
-#define S2W_X_B2				400
-#define S2W_X_FINAL				180
+#define S2W_Y_MAX               1920
+#define S2W_X_MAX               1080
+#define S2W_Y_LIMIT             S2W_Y_MAX-130
+#define S2W_X_B1                400
+#define S2W_X_B2                700
+#define S2W_X_FINAL             250
 #endif
 
 /* Resources */
