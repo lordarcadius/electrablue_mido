@@ -144,10 +144,10 @@ static void detect_doubletap2wake(int x, int y, bool st)
                 x, y, (single_touch) ? "true" : "false");
 #endif
 	if ((single_touch) && (dt2w_switch > 0) && (exec_count) && (touch_cnt)) {
-		
+
 		if ((ktime_to_ms(ktime_get())-tap_time_pre) >= DT2W_TIME)
 			doubletap2wake_reset();
-		
+
 		if (touch_nr == 0) {
 			new_touch(x, y);
 		} else if (touch_nr == 1) {
@@ -219,7 +219,8 @@ static void dt2w_input_event(struct input_handle *handle, unsigned int type,
 
 static int input_dev_filter(struct input_dev *dev) {
 	if (strstr(dev->name, "touch") ||
-		strstr(dev->name, "synaptics_dsx_i2c")) {
+	strstr(dev->name, "synaptics_dsx_i2c") ||
+	strstr(dev->name, "ft5435_ts")) {
 		return 0;
 	} else {
 		return 1;
