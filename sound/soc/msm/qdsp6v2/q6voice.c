@@ -37,7 +37,7 @@
 #include <linux/input/sweep2wake.h>
 #endif
 #if (defined(CONFIG_TOUCHSCREEN_DOUBLETAP2WAKE) || defined(CONFIG_TOUCHSCREEN_SWEEP2WAKE))
-#include <linux/input/ft5x06_720p.h>
+#include <linux/ft5435_ts.h>
 #endif
 
 #define TIMEOUT_MS 300
