@@ -2163,6 +2163,7 @@ static int dwc3_msm_suspend(struct dwc3_msm *mdwc)
 		dev_dbg(mdwc->dev, "defer suspend with %d(msecs)\n",
 					mdwc->lpm_to_suspend_delay);
 		pm_wakeup_event(mdwc->dev, mdwc->lpm_to_suspend_delay);
+#ifndef CONFIG_MACH_XIAOMI_MIDO
 	} else {
 		pm_relax(mdwc->dev);
 	}
@@ -2204,6 +2205,7 @@ static int dwc3_msm_resume(struct dwc3_msm *mdwc)
 		return 0;
 	}
 
+#ifndef CONFIG_MACH_XIAOMI_MIDO
 	pm_stay_awake(mdwc->dev);
 
 	/* Vote for TCXO while waking up USB HSPHY */
