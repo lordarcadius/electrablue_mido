@@ -30,9 +30,9 @@ White='\e[0;37m'        # White
 # Tweakable options
 export ARCH=arm64
 export SUBARCH=arm64
-export KBUILD_BUILD_USER="LordArcadius"
-export KBUILD_BUILD_HOST="DroidBox"
-export CROSS_COMPILE=/home/vipul/aarch64-linaro-linux-android/bin/aarch64-linaro-linux-android-
+export KBUILD_BUILD_USER="vipul"
+export KBUILD_BUILD_HOST="lordarcadius"
+export CROSS_COMPILE=/home/vipul/kernels/toolchains/aarch64-linaro-linux-android/bin/aarch64-linaro-linux-android-
 
 # Compilation Scripts Are Below
 
