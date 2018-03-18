@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 3.18.91 Kernel Configuration
+# Linux/arm64 3.18.100 Kernel Configuration
 #
 
 # ElectraBlue
@@ -72,7 +72,7 @@ CONFIG_SWEEP2SLEEP=y
 CONFIG_INIT_ENV_ARG_LIMIT=32
 CONFIG_CROSS_COMPILE=""
 # CONFIG_COMPILE_TEST is not set
-CONFIG_LOCALVERSION="-ElectraBlue-10.0-mido"
+CONFIG_LOCALVERSION="-ElectraBlue-11.0-mido"
 CONFIG_LOCALVERSION_AUTO=n
 CONFIG_DEFAULT_HOSTNAME="(none)"
 CONFIG_SWAP=y
