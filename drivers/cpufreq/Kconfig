@@ -248,6 +248,17 @@ config CPU_FREQ_GOV_SCHED
 
 comment "CPU frequency scaling drivers"
 
+config CPU_WAKE_BOOST
+	bool "CPU wake boost"
+	depends on FB
+	help
+	  Boosts all online CPUs to policy->max (scaling_max_freq) when the display
+	  is powered on, as reported by the framebuffer chain notifier. This helps
+	  make the display power on faster, as well as ensures good performance
+	  immediately after powering on the display.
+
+comment "CPU frequency scaling drivers"
+
 config CPUFREQ_DT
 	tristate "Generic DT based cpufreq driver"
 	depends on HAVE_CLK && OF
