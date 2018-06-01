@@ -31,6 +31,8 @@ echo -e "***********************************************$nocol"
 LC_ALL=C date +%Y-%m-%d
 kernel_dir=$PWD
 build=$kernel_dir/out
+export ARCH=arm64
+export SUBARCH=arm64
 export CROSS_COMPILE="/home/vipul/kernels/toolchains/aarch64-linux-android/bin/aarch64-opt-linux-android-"
 kernel="ElectraBlue"
 version="11.0"
@@ -57,7 +59,6 @@ if [ -d arch/arm64/boot/"$kerneltype" ]; then
 			mkdir out
 			rm -rf "$zip"/modules
 			mkdir "$zip"/modules
-			export ARCH=arm64
 			make clean && make mrproper
 			echo "Working directory cleaned...";;
 		n|N )
@@ -99,7 +100,6 @@ else
                         mkdir out
                         rm -rf "$zip"/modules
                         mkdir "$zip"/modules
-			export ARCH=arm64
                         make clean && make mrproper
                         echo "Working directory cleaned...";;
 		n|N )
