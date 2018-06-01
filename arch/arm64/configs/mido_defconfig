@@ -2,6 +2,11 @@
 # Automatically generated file; DO NOT EDIT.
 # Linux/arm64 3.18.71 Kernel Configuration
 #
+
+# ElectraBlue
+CONFIG_STATE_NOTIFIER=y
+
+
 CONFIG_ARM64=y
 CONFIG_64BIT=y
 CONFIG_ARCH_PHYS_ADDR_T_64BIT=y
