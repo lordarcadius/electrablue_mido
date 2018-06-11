@@ -23,3 +23,14 @@ config MSM_MCU_TIME_SYNC
        help
          Say Y here if you want to get mcu and apq8009 data transfer
          with gpio.
+
+config DTS_EAGLE
+        bool "DTS Eagle support"
+        depends on SND_SOC_QDSP6V2
+        select SND_HWDEP
+        default n
+        help
+          To add DTS Eagle support on QDSP6 targets.
+          Eagle is a DTS pre/post processing
+          package that includes HeadphoneX. The configuration
+          includes sending tuning parameters of various modules.
