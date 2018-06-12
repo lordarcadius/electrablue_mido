@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2018, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2015-2017, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -44,6 +44,9 @@
 #include "wcd9xxx-resmgr-v2.h"
 #include "wcd_cpe_core.h"
 #include "wcdcal-hwdep.h"
+#include <linux/proc_fs.h>
+#include <../drivers/base/regmap/internal.h>
+#include <linux/switch.h>
 
 #define TASHA_RX_PORT_START_NUMBER  16
 
@@ -108,7 +111,7 @@
 /* Convert from vout ctl to micbias voltage in mV */
 #define WCD_VOUT_CTL_TO_MICB(v) (1000 + v * 50)
 
-#define TASHA_ZDET_NUM_MEASUREMENTS 900
+#define TASHA_ZDET_NUM_MEASUREMENTS 150
 #define TASHA_MBHC_GET_C1(c)  ((c & 0xC000) >> 14)
 #define TASHA_MBHC_GET_X1(x)  (x & 0x3FFF)
 /* z value compared in milliOhm */
@@ -138,6 +141,8 @@ static int cpe_debug_mode;
 #define DAPM_MICBIAS3_STANDALONE "MIC BIAS3 Standalone"
 #define DAPM_MICBIAS4_STANDALONE "MIC BIAS4 Standalone"
 
+int g_DebugMode = 1;
+struct switch_dev *g_audiowizard_force_preset_sdev = NULL;
 #define DAPM_LDO_H_STANDALONE "LDO_H"
 module_param(cpe_debug_mode, int,
 	     S_IRUGO | S_IWUSR | S_IWGRP);
@@ -851,15 +856,6 @@ static const struct tasha_reg_mask_val tasha_spkr_mode1[] = {
 	{WCD9335_CDC_BOOST1_BOOST_CTL, 0x7C, 0x44},
 };
 
-static const struct tasha_reg_mask_val tasha_high_impedance[] = {
-	{WCD9335_TLMM_I2S_TX_SD0_PINCFG, 0x1F, 0x0C},
-	{WCD9335_TLMM_I2S_TX_SD1_PINCFG, 0x1F, 0x0C},
-	{WCD9335_TLMM_I2S_TX_SCK_PINCFG, 0x1F, 0x0C},
-	{WCD9335_TLMM_I2S_TX_WS_PINCFG, 0x1F, 0x0C},
-	{WCD9335_TEST_DEBUG_PIN_CTL_OE_1, 0xE0, 0xE0},
-	{WCD9335_TEST_DEBUG_PIN_CTL_OE_2, 0x01, 0x01},
-};
-
 /**
  * tasha_set_spkr_gain_offset - offset the speaker path
  * gain with the given offset value.
@@ -961,20 +957,6 @@ static void tasha_cdc_sido_ccl_enable(struct tasha_priv *tasha, bool ccl_flag)
 			snd_soc_update_bits(codec,
 				WCD9335_SIDO_SIDO_CCL_10, 0xFF, 0x02);
 	}
-}
-
-static void tasha_set_high_impedance_mode(struct snd_soc_codec *codec)
-{
-	const struct tasha_reg_mask_val *regs;
-	int i, size;
-
-	dev_dbg(codec->dev, "%s: setting TX I2S in Hi-Z mode\n", __func__);
-	regs = tasha_high_impedance;
-	size = ARRAY_SIZE(tasha_high_impedance);
-
-	for (i = 0; i < size; i++)
-		snd_soc_update_bits(codec, regs[i].reg,
-				    regs[i].mask, regs[i].val);
 }
 
 static bool tasha_cdc_is_svs_enabled(struct tasha_priv *tasha)
@@ -4005,13 +3987,19 @@ static void tasha_codec_bridge_mclk_enable(struct snd_soc_codec *codec,
 		 */
 		snd_soc_update_bits(codec,
 				    WCD9335_DATA_HUB_DATA_HUB_I2S_CLK,
-				    0x03, 0x02);
+				    0x02, 0x02);
+		snd_soc_update_bits(codec,
+				    WCD9335_DATA_HUB_DATA_HUB_I2S_CLK,
+				    0x1, 0x0);
 	} else {
 		snd_soc_update_bits(codec,
 				    WCD9335_DATA_HUB_DATA_HUB_I2S_CLK,
-				    0x03, 0x01);
-	}
-}
+				    0x02, 0x00);
+		snd_soc_update_bits(codec,
+				    WCD9335_DATA_HUB_DATA_HUB_I2S_CLK,
+				    0x1, 0x1);
+	};
+};
 
 static int tasha_codec_bridge_tx_mclk_supply(struct snd_soc_dapm_widget *w,
 					   struct snd_kcontrol *kcontrol,
@@ -11812,12 +11800,6 @@ static int tasha_hw_params(struct snd_pcm_substream *substream,
 			snd_soc_update_bits(codec,
 					WCD9335_DATA_HUB_DATA_HUB_RX_I2S_CTL,
 					0x1c, (rx_fs_rate << 2));
-			snd_soc_update_bits(codec,
-					WCD9335_DATA_HUB_DATA_HUB_TX_I2S_CTL,
-					0x20, i2s_bit_mode << 5);
-			snd_soc_update_bits(codec,
-					WCD9335_DATA_HUB_DATA_HUB_TX_I2S_CTL,
-					0x1c, (rx_fs_rate << 2));
 		}
 		break;
 	case SNDRV_PCM_STREAM_CAPTURE:
@@ -11936,19 +11918,13 @@ static int tasha_hw_params(struct snd_pcm_substream *substream,
 			snd_soc_update_bits(dai->codec,
 					WCD9335_DATA_HUB_DATA_HUB_TX_I2S_CTL,
 					0x1C, (tx_fs_rate << 2));
-			snd_soc_update_bits(codec,
-					WCD9335_DATA_HUB_DATA_HUB_RX_I2S_CTL,
-					0x20, i2s_bit_mode << 5);
-			snd_soc_update_bits(dai->codec,
-					WCD9335_DATA_HUB_DATA_HUB_RX_I2S_CTL,
-					0x1C, (tx_fs_rate << 2));
-		}
+		};
 		break;
 	default:
 		pr_err("%s: Invalid stream type %d\n", __func__,
 			substream->stream);
 		return -EINVAL;
-	}
+	};
 	if (dai->id == AIF4_VIFEED)
 		tasha->dai[dai->id].bit_width = 32;
 
@@ -13970,9 +13946,20 @@ static int tasha_codec_probe(struct snd_soc_codec *codec)
 	mutex_unlock(&codec->mutex);
 	snd_soc_dapm_sync(dapm);
 
-	if (pdata->wcd9xxx_mic_tristate)
-		tasha_set_high_impedance_mode(codec);
-
+	/* ASUS_BSP Paul +++ */
+        if (!g_audiowizard_force_preset_sdev) {
+		g_audiowizard_force_preset_sdev = kzalloc(sizeof(struct switch_dev), GFP_KERNEL);
+		if (!g_audiowizard_force_preset_sdev) {
+			pr_err("%s: failed to allocate switch_dev\n", __func__);
+			ret = -ENOMEM;
+		}
+		g_audiowizard_force_preset_sdev->name = "audiowizard_force_preset";
+		g_audiowizard_force_preset_sdev->state = 0;
+		ret = switch_dev_register(g_audiowizard_force_preset_sdev);
+		if (ret < 0)
+			pr_err("%s: failed to register switch audiowizard_force_preset\n", __func__);
+	}
+	/* ASUS_BSP Paul --- */
 	return ret;
 
 err_pdata:
