@@ -55,8 +55,6 @@ if [ -d arch/arm64/boot/"$kerneltype" ]; then
 		y|Y )
 			rm -rf out
 			mkdir out
-			rm -rf "$zip"/modules
-			mkdir "$zip"/modules
 			make clean && make mrproper
 			echo "Working directory cleaned...";;
 		n|N )
@@ -90,7 +88,6 @@ else
 		y|Y )
                         rm -rf out
                         mkdir out
-                        rm -rf "$zip"/modules
                         make clean && make mrproper
                         echo "Working directory cleaned...";;
 		n|N )
