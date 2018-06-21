@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 3.18.71 Kernel Configuration
+# Linux/arm64 3.18.113 Kernel Configuration
 #
 
 # ElectraBlue
@@ -26,6 +26,7 @@ CONFIG_QNS_SYSTEM=y
 CONFIG_WIREGUARD=y
 # CONFIG_WIREGUARD_DEBUG is not set
 CONFIG_FINGERPRINT_BOOST=y
+CONFIG_CPU_WAKE_BOOST=y
 
 CONFIG_ARM64=y
 CONFIG_64BIT=y
