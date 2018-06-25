@@ -26,7 +26,6 @@ config MSM_MCU_TIME_SYNC
 
 config DTS_EAGLE
         bool "DTS Eagle support"
-        depends on SND_SOC_QDSP6V2
         select SND_HWDEP
         default n
         help
