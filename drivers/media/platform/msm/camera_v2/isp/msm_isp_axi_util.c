@@ -3001,10 +3001,10 @@ static int msm_isp_start_axi_stream(struct vfe_device *vfe_dev,
 			}
 		}
 	}
+	mutex_unlock(&vfe_dev->buf_mgr->lock);
 #ifdef CONFIG_MACH_XIAOMI_MIDO
 	msm_isp_update_stream_bandwidth(vfe_dev);
 #else
-	mutex_unlock(&vfe_dev->buf_mgr->lock);
 	msm_isp_update_stream_bandwidth(vfe_dev, stream_cfg_cmd->hw_state);
 #endif
 	vfe_dev->hw_info->vfe_ops.axi_ops.reload_wm(vfe_dev,
