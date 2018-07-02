@@ -690,18 +690,6 @@ static struct usb_gadget_strings *fn_strings[] = {
 	NULL,
 };
 
-static struct usb_qualifier_descriptor devqual_desc = {
-	.bLength = sizeof devqual_desc,
-	.bDescriptorType = USB_DT_DEVICE_QUALIFIER,
-
-	.bcdUSB = cpu_to_le16(0x200),
-	.bDeviceClass = USB_CLASS_MISC,
-	.bDeviceSubClass = 0x02,
-	.bDeviceProtocol = 0x01,
-	.bNumConfigurations = 1,
-	.bRESERVED = 0,
-};
-
 static struct usb_interface_assoc_descriptor iad_desc = {
 	.bLength = sizeof iad_desc,
 	.bDescriptorType = USB_DT_INTERFACE_ASSOCIATION,
@@ -1806,7 +1794,7 @@ afunc_set_alt(struct usb_function *fn, unsigned intf, unsigned alt)
 			factor = 1000;
 		} else {
 			ep_desc = &hs_epin_desc;
-			factor = 125;
+			factor = 8000;
 		}
 
 		if (alt != 0) {
@@ -1839,7 +1827,7 @@ afunc_set_alt(struct usb_function *fn, unsigned intf, unsigned alt)
 		uac2->p_framesize = opts->p_ssize *
 				    num_channels(opts->p_chmask);
 		rate = opts->p_srate * uac2->p_framesize;
-		uac2->p_interval = (1 << (ep_desc->bInterval - 1)) * factor;
+		uac2->p_interval = factor / (1 << (ep_desc->bInterval - 1));
 		uac2->p_pktsize = min_t(unsigned int, rate / uac2->p_interval,
 					prm->max_psize);
 
@@ -1989,7 +1977,7 @@ in_rq_range(struct usb_function *fn, const struct usb_ctrlrequest *cr)
 
 	pr_debug("%s: entity_id:%u\n", __func__, entity_id);
 	if (control_selector == UAC2_CS_CONTROL_SAM_FREQ) {
-		if (entity_id == USB_IN_CLK_ID || USB_OUT_CLK_ID) {
+		if (entity_id == USB_IN_CLK_ID || entity_id == USB_OUT_CLK_ID) {
 			int i;
 
 			r.wNumSubRanges = CLK_FREQ_ARR_SIZE;
