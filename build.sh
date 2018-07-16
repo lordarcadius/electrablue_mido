@@ -31,19 +31,19 @@ echo -e "***********************************************$nocol"
 LC_ALL=C date +%Y-%m-%d
 kernel_dir=$PWD
 build=$kernel_dir/out
+export ARCH=arm64
+export SUBARCH=arm64
 export CROSS_COMPILE="/home/vipul/kernels/toolchains/aarch64-linux-android/bin/aarch64-opt-linux-android-"
 kernel="ElectraBlue"
-version="11.0"
+version="12.0"
 vendor="xiaomi"
-android="OREO"
+android="TREBLE"
 device="mido"
 zip=zip
 date=`date +"%Y%m%d-%H%M"`
 config=mido_defconfig
 kerneltype="Image.gz-dtb"
 jobcount="-j$(grep -c ^processor /proc/cpuinfo)"
-#modules_dir=$kernel_dir/"$zip"/system/lib/modules
-modules_dir=$kernel_dir/"$zip"/modules
 zip_name="$kernel"-"$version"-"$date"-"$android"-"$device".zip
 export KBUILD_BUILD_USER=vipul
 export KBUILD_BUILD_HOST=lordarcadius
@@ -55,13 +55,10 @@ if [ -d arch/arm64/boot/"$kerneltype" ]; then
 		y|Y )
 			rm -rf out
 			mkdir out
-			rm -rf "$zip"/modules
-			mkdir "$zip"/modules
-			export ARCH=arm64
 			make clean && make mrproper
 			echo "Working directory cleaned...";;
 		n|N )
-			exit 0;;
+			echo "Starting dirty build!";;
 		* )
 			echo "Invalid...";;
 	esac
@@ -84,12 +81,6 @@ fi
 echo "Extracting files..."
 if [ -f arch/arm64/boot/"$kerneltype" ]; then
 	cp arch/arm64/boot/"$kerneltype" "$zip"/"$kerneltype"
-#        mkdir -p zip/modules/pronto
-#	cp drivers/staging/prima/wlan.ko zip/modules/pronto/pronto_wlan.ko
-	find . -name '*.ko' -exec cp {} $modules_dir/ \;
-	"$CROSS_COMPILE"strip --strip-unneeded "$zip"/modules/*.ko &> /dev/null
-        mkdir -p zip/modules/pronto/
-        mv zip/modules/wlan.ko zip/modules/pronto/pronto_wlan.ko
 else
 	echo "Nothing has been made..."
 	read -p "Clean working directory..(y/n)? : " achoice
@@ -97,13 +88,10 @@ else
 		y|Y )
                         rm -rf out
                         mkdir out
-                        rm -rf "$zip"/modules
-                        mkdir "$zip"/modules
-			export ARCH=arm64
                         make clean && make mrproper
                         echo "Working directory cleaned...";;
 		n|N )
-			exit 0;;
+			echo "Starting dirty build!";;
 		* )
 			echo "Invalid...";;
 	esac
