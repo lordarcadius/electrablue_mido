@@ -490,6 +490,11 @@ static int add_opp(struct clk *c, struct device *dev, unsigned long max_rate)
 	long ret;
 	bool first = true;
 	int j = 1;
+    
+	if (!dev) {
+		pr_warn("clock-cpu: NULL CPU device\n");
+		return -ENODEV;
+	}
 
 	while (1) {
 		rate = c->fmax[j++];
