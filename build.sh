@@ -1,6 +1,7 @@
+#!/bin/bash
+
 #
-# Copyright © 2017, "lordarcadius" <vipuljha08@gmail.com>
-# Copyright © 2017, "arn4v"
+# Copyright © 2018, "Vipul Jha" aka "LordArcadius" <vipuljha08@gmail.com>
 #
 # This software is licensed under the terms of the GNU General Public
 # License version 2, as published by the Free Software Foundation, and
@@ -13,117 +14,160 @@
 #
 # Please maintain this if you use this script or any part of it
 
-# Color Codes
-Black='\e[0;30m'        # Black
-Red='\e[0;31m'          # Red
-Green='\e[0;32m'        # Green
-Yellow='\e[0;33m'       # Yellow
-Blue='\e[0;34m'         # Blue
-Purple='\e[0;35m'       # Purple
-Cyan='\e[0;36m'         # Cyan
-White='\e[0;37m'        # White
+# Bash Colors
+GREEN='\033[01;32m'
+RED='\033[01;31m'
+BLINK_RED='\033[05;31m'
+YELLOW='\e[0;33m'
+BLUE='\e[0;34m'
+PURPLE='\e[0;35m'
+CYAN='\e[0;36m'
+WHITE='\e[0;37m'
+RESET='\033[0m'
 
-
-echo -e "$White***********************************************"
-echo "         Compiling ElectraBlue Kernel             "
-echo -e "***********************************************$nocol"
-
-LC_ALL=C date +%Y-%m-%d
-kernel_dir=$PWD
-build=$kernel_dir/out
+# Resources
 export ARCH=arm64
 export SUBARCH=arm64
 export CROSS_COMPILE="/home/vipul/kernels/toolchains/aarch64-linux-android/bin/aarch64-opt-linux-android-"
-kernel="ElectraBlue"
-version="12.1"
-vendor="xiaomi"
-android="TREBLE"
-device="mido"
-zip=zip
-date=`date +"%Y%m%d-%H%M"`
-config=mido_defconfig
-kerneltype="Image.gz-dtb"
-jobcount="-j$(grep -c ^processor /proc/cpuinfo)"
-zip_name="$kernel"-"$version"-"$date"-"$android"-"$device".zip
+KERNEL="ElectraBlue"
+THREAD="-j$(grep -c ^processor /proc/cpuinfo)"
+IMAGE="Image"
+DTB="dtb"
+DEFCONFIG="mido_defconfig"
+
+# Paths
+KERNEL_DIR=$PWD
+REPACK_DIR=$KERNEL_DIR/zip
+ZIMAGE_DIR=$KERNEL_DIR/arch/arm64/boot
+OUT=$KERNEL_DIR/out
+
+# Date
+DATE_START=$(date +"%s")
+
+# Functions
+clean_all() 
+{
+		rm -rf out
+		mkdir out
+		make clean && make mrproper
+}
+
+make_kernel()
+{
+		echo
+		make $DEFCONFIG
+		make $THREAD
+}
+
+make_zip()
+{
+		cd $REPACK_DIR
+		mkdir kernel
+		mkdir treble
+		mkdir nontreble
+		cp $KERNEL_DIR/arch/arm64/boot/dts/qcom/msm8953-qrd-sku3-mido-nontreble.dtb $REPACK_DIR/nontreble/
+		cp $KERNEL_DIR/arch/arm64/boot/dts/qcom/msm8953-qrd-sku3-mido-treble.dtb $REPACK_DIR/treble/
+		cp $KERNEL_DIR/arch/arm64/boot/Image.gz $REPACK_DIR/kernel/
+		zip -r9 `echo $ZIP_NAME`.zip *
+		cp *.zip $OUT
+		rm *.zip
+		rm -rf kernel
+		rm -rf treble
+		rm -rf nontreble
+		cd $KERNEL_DIR
+		rm arch/arm64/boot/Image.gz
+		#rm arch/arm64/boot/dts/qcom/msm8953-qrd-sku3-mido-nontreble.dtb
+		#rm arch/arm64/boot/dts/qcom/msm8953-qrd-sku3-mido-treble.dtb
+}
+
+show_output()
+{
+		echo -e "${GREEN}"
+		echo "======================"
+		echo "= Build Successful!! ="
+		echo "======================"
+		echo -e "${RESET}"
+		DATE_END=$(date +"%s")
+		DIFF=$(($DATE_END - $DATE_START))
+		echo "Your zip is here: $(tput setaf 229)"$OUT"/$(tput sgr0)$(tput setaf 226)"$ZIP_NAME".zip$(tput sgr0)"
+		echo
+		echo "Your build time: $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds."
+}
+
+# Header
+clear
+echo -e "$GREEN"
+echo "======================"
+echo "= ElectraBlue Kernel ="
+echo "======================"
+echo -e "$RESET"
+
+
+# Kernel Details
+VERSION="12.1"
+VENDOR="xiaomi"
+#ANDROID="OREO"
+DEVICE="mido"
 export KBUILD_BUILD_USER=vipul
 export KBUILD_BUILD_HOST=lordarcadius
+DATE=`date +"%Y%m%d-%H%M"`
+ZIP_NAME="$KERNEL"-"$VERSION"-"$DATE"-"$DEVICE"
 
-echo "Checking for build..."
-if [ -d arch/arm64/boot/"$kerneltype" ]; then
-	read -p "Previous build found, clean working directory..(y/n)? : " cchoice
-	case "$cchoice" in
-		y|Y )
-			rm -rf out
-			mkdir out
-			make clean && make mrproper
-			echo "Working directory cleaned...";;
-		n|N )
-			echo "Starting dirty build!";;
-		* )
-			echo "Invalid...";;
-	esac
-	read -p "Begin build now..(y/n)? : " dchoice
-	case "$dchoice" in
-		y|Y)
-			make "$config"
-			make "$jobcount"
-			exit 0;;
-
-		n|N )
-			exit 0;;
-		* )
-			echo "Invalid...";;
-	esac
-BUILD_END=$(date +"%s")
-DIFF=$(($BUILD_END - $BUILD_START))
-echo -e "$Green Build completed in $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds.$nocol"
-fi
-echo "Extracting files..."
-if [ -f arch/arm64/boot/"$kerneltype" ]; then
-	cp arch/arm64/boot/"$kerneltype" "$zip"/"$kerneltype"
+# Check old build
+if [ -f arch/arm64/boot/"Image.gz" ]; then
+echo "$(tput setaf 4)Previous build found! Creating Zip.$(tput sgr0)"
+	make_zip
+	show_output
+exit 0;
 else
-	echo "Nothing has been made..."
-	read -p "Clean working directory..(y/n)? : " achoice
-	case "$achoice" in
-		y|Y )
-                        rm -rf out
-                        mkdir out
-                        make clean && make mrproper
-                        echo "Working directory cleaned...";;
-		n|N )
-			echo "Starting dirty build!";;
-		* )
-			echo "Invalid...";;
-	esac
-	read -p "Begin build now..(y/n)? : " bchoice
-	case "$bchoice" in
-		y|Y)
-			make "$config"
-			make "$jobcount"
-			exit 0;;
-		n|N )
-			exit 0;;
-		* )
-			echo "Invalid...";;
-	esac
+echo "No previous build found!"
 fi
 
-echo "Zipping..."
-if [ -f "$zip"/"$kerneltype" ]; then
-	cd "$zip"
-	zip -r ../$zip_name .
-	mv ../$zip_name $build
-	rm "$kerneltype"
-	cd ..
-	rm -rf arch/arm64/boot/"$kerneltype"
-	export outdir=""$build""
-        export out=""$build""
-        export OUT=""$build""
-	echo "$BluePackage complete: "$build"/"$zip_name"$nocol"
-	exit 0;
-else
-	echo "No $kerneltype found..."
-	exit 0;
-fi
-# Export script by Savoca
-# Thank You Savoca!
+echo
+
+# Asks for a clean build
+while read -p "$(tput setaf 209)Do you want to clean stuffs? (y/n):$(tput sgr0) " cchoice
+do
+case "$cchoice" in
+	y|Y )
+		clean_all
+		echo
+		echo "All Cleaned now."
+		break
+		;;
+	n|N )
+		break
+		;;
+	* )
+		echo
+		echo "Invalid try again!"
+		break
+		echo
+		;;
+esac
+done
+
+echo
+
+# Asks to build
+while read -p "$(tput setaf 6)Do you want to build? (y/n):$(tput sgr0) " dchoice
+do
+case "$dchoice" in
+	y|Y )
+		make_kernel
+		make_zip
+		break
+		;;
+	n|N )
+		break
+		;;
+	* )
+		echo
+		echo "Invalid try again!"
+		echo
+		;;
+esac
+done
+
+# Shows the output
+show_output
