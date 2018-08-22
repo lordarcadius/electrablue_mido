@@ -95,7 +95,7 @@ show_output()
 }
 
 # Header
-clear
+tput reset
 echo -e "$GREEN"
 echo "======================"
 echo "= ElectraBlue Kernel ="
@@ -140,7 +140,8 @@ case "$cchoice" in
 		;;
 	* )
 		echo
-		echo "Invalid try again!"
+		echo "Invalid input! Try again you noob (-_-)"
+		exit 0;
 		break
 		echo
 		;;
@@ -159,12 +160,17 @@ case "$dchoice" in
 		break
 		;;
 	n|N )
+		echo
+		echo "Nothing has been made. Terminating the script ;_;"
+		exit 0;
 		break
 		;;
 	* )
 		echo
-		echo "Invalid try again!"
+		echo "Invalid input! Try again you noob (-_-)"
 		echo
+		exit 0;
+		break
 		;;
 esac
 done
