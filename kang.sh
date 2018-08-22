@@ -95,7 +95,7 @@ export KBUILD_BUILD_HOST=lordarcadius
 date=`date +"%Y%m%d-%H%M"`
 ZIP_NAME="$kernel"-"$version"-"$date"-"$android"-"$device"
 
-if [ -f arch/arm64/boot/"Image.dtb" ]; then
+if [ -f arch/arm64/boot/"Image.gz" ]; then
 echo "$(tput setaf 4)Previos build found! Creating Zip.$(tput sgr0)"
 	make_zip
 else
