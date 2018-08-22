@@ -71,7 +71,13 @@ make_zip()
 		zip -r9 `echo $ZIP_NAME`.zip *
 		cp *.zip $OUT
 		rm *.zip
+		rm -rf kernel
+		rm -rf treble
+		rm -rf nontreble
 		cd $KERNEL_DIR
+		rm arch/arm64/boot/Image.gz
+		rm arch/arm64/boot/dts/qcom/msm8953-qrd-sku3-mido-nontreble.dtb
+		rm arch/arm64/boot/dts/qcom/msm8953-qrd-sku3-mido-treble.dtb
 }
 
 
