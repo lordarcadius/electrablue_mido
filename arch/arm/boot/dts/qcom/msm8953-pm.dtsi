@@ -38,10 +38,17 @@
 		qcom,use-psci;
 		#address-cells = <1>;
 		#size-cells = <0>;
-		clock-names = "l2_clk", "cpu0_clk", "cpu1_clk",
-				"cpu2_clk", "cpu3_clk", "cpu4_clk",
-				"cpu5_clk", "cpu6_clk", "cpu7_clk";
-		clocks = <&clock_cpu clk_cci_clk>,
+		clock-names = "l2_clk", 
+				/* Inline this with Clockfreq */
+				"cpu0_clk", "cpu1_clk", "cpu2_clk", "cpu3_clk", 
+				"cpu4_clk", "cpu5_clk", "cpu6_clk", "cpu7_clk",
+				"cpu8_clk", "cpu9_clk", "cpu10_clk", "cpu11_clk";
+		clocks = 
+			 <&clock_cpu clk_cci_clk>,
+			 <&clock_cpu clk_a53_pwr_clk>,
+			 <&clock_cpu clk_a53_pwr_clk>,
+			 <&clock_cpu clk_a53_pwr_clk>,
+			 <&clock_cpu clk_a53_pwr_clk>,
 			 <&clock_cpu clk_a53_pwr_clk>,
 			 <&clock_cpu clk_a53_pwr_clk>,
 			 <&clock_cpu clk_a53_pwr_clk>,
@@ -103,6 +110,7 @@
 				label = "pwr";
 				qcom,spm-device-names = "l2";
 				qcom,default-level=<0>;
+				qcom,use-prediction;
 				qcom,cpu = <&CPU0 &CPU1 &CPU2 &CPU3>;
 				qcom,psci-mode-shift = <4>;
 				qcom,psci-mode-mask = <0xf>;
@@ -196,6 +204,7 @@
 				label = "perf";
 				qcom,spm-device-names = "l2";
 				qcom,default-level=<0>;
+				qcom,use-prediction;
 				qcom,cpu = <&CPU4 &CPU5 &CPU6 &CPU7>;
 				qcom,psci-mode-shift = <4>;
 				qcom,psci-mode-mask = <0xf>;
@@ -287,7 +296,7 @@
 	qcom,mpm@601d4 {
 		compatible = "qcom,mpm-v2";
 		reg = <0x601d4 0x1000>, /* MSM_RPM_MPM_BASE 4K */
-		    <0xb011008 0x4>;
+				<0xb011008 0x4>;
 		reg-names = "vmpm", "ipc";
 		interrupts = <0 171 1>;
 		clocks = <&clock_gcc clk_xo_lpm_clk>;
@@ -336,6 +345,8 @@
 			<0xff 114>, /* qdsd_intr_out */
 			<0xff 126>, /* app_tcu_cxt_irpt_vec[11] */
 			<0xff 128>, /* blsp1_peripheral_irq[3] */
+			<0xff 129>, /* blsp1 qup3 irq */
+			<0xff 130>, /* blsp1 qup4 irq */
 			<0xff 131>, /* qup_irq */
 			<0xff 136>, /* app_tcu_cxt_irpt_vec[15] */
 			<0xff 137>, /* app_tcu_cxt_irpt_vec[16] */
@@ -402,6 +413,7 @@
 			<0xff 264>, /* arm-smmu context fault */
 			<0xff 269>, /* rpm_wdog_expired_irq */
 			<0xff 270>, /* blsp1_bam_irq[0] */
+			<0xff 271>, /* blsp2_bam_irq */
 			<0xff 273>, /* smmu_bus_intr[18] */
 			<0xff 274>, /* smmu_bus_intr[19] */
 			<0xff 275>, /* rpm_ipc(30) */
@@ -496,8 +508,8 @@
 	qcom,rpm-stats@200000 {
 		compatible = "qcom,rpm-stats";
 		reg = <0x200000 0x1000>,
-		      <0x290014 0x4>,
-		      <0x29001c 0x4>;
+					<0x290014 0x4>,
+					<0x29001c 0x4>;
 		reg-names = "phys_addr_base", "offset_addr",
 						"heap_phys_addrbase";
 		qcom,sleep-stats-version = <2>;

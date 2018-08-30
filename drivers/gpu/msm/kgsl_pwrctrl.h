@@ -28,7 +28,7 @@
 #define KGSL_MAX_CLKS 13
 #define KGSL_MAX_REGULATORS 2
 
-#define KGSL_MAX_PWRLEVELS 10
+#define KGSL_MAX_PWRLEVELS 20
 
 /* Only two supported levels, min & max */
 #define KGSL_CONSTRAINT_PWR_MAXLEVELS 2
