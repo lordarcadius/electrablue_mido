@@ -4,7 +4,7 @@
 ## AnyKernel setup
 # begin properties
 properties() { '
-kernel.string=ElectraBlue Kernel For Redmi Note 4
+kernel.string=lordarcadius@xda-developers
 do.devicecheck=1
 do.modules=0
 do.cleanup=1
@@ -41,8 +41,8 @@ dump_boot;
 
 # begin ramdisk changes
 
-# init.rc
-insert_line init.rc 'kud' after 'import /init.\${ro.zygote}.rc' 'import /init.kud.rc';
+# insert init.spectrum.rc in init.rc
+insert_line init.rc "import /init.spectrum.rc" after "import /init.trace.rc" "import /init.spectrum.rc";
 
 # end ramdisk changes
 
