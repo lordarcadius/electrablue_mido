@@ -94,6 +94,19 @@ show_output()
 		echo "Your build time: $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds."
 }
 
+show_fail()
+{
+		echo -e "${RED}"
+		echo "======================"
+		echo "=   Build Failed!!   ="
+		echo "======================"
+		echo -e "${RESET}"
+		DATE_END=$(date +"%s")
+		DIFF=$(($DATE_END - $DATE_START))
+		echo
+		echo "Your build time: $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds."
+}
+
 # Header
 tput reset
 echo -e "$GREEN"
@@ -156,7 +169,12 @@ do
 case "$dchoice" in
 	y|Y )
 		make_kernel
+		if [ -f arch/arm64/boot/"Image.gz" ]; then
 		make_zip
+		show_output
+		else
+		show_fail
+		fi
 		break
 		;;
 	n|N )
@@ -174,6 +192,3 @@ case "$dchoice" in
 		;;
 esac
 done
-
-# Shows the output
-show_output
