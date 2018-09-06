@@ -456,6 +456,10 @@ static int tz_get_target_freq(struct devfreq *devfreq, unsigned long *freq,
 		pr_err(TAG "bad freq %ld\n", stats.current_frequency);
 		return level;
 	}
+	// idle freq or any non governor drop should move last_level as well, so adrenoboost works on proper leveling
+	if (level != priv->bin.last_level) {
+		priv->bin.last_level = level;
+	}
 
 	/*
 	 * If there is an extended block of busy processing,
