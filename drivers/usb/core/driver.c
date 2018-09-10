@@ -545,10 +545,6 @@ int usb_driver_claim_interface(struct usb_driver *driver,
 	if (device_is_registered(dev))
 		retval = device_bind_driver(dev);
 
-	/* Attempt to re-enable USB3 LPM, if the disable was successful. */
-	if (!lpm_disable_error)
-		usb_unlocked_enable_lpm(udev);
-
 	if (retval) {
 		dev->driver = NULL;
 		usb_set_intfdata(iface, NULL);
