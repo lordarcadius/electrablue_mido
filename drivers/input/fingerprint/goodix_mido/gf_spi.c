@@ -341,7 +341,6 @@ static long gf_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		for (i = 0; i < ARRAY_SIZE(key_map); i++) {
 			if (key_map[i].val == gf_key.key) {
 				if (KEY_CAMERA == gf_key.key) {
-					printk("lihao send camera key!\n");
 					input_report_key(gf_dev->input, KEY_SELECT, gf_key.value);
 					input_sync(gf_dev->input);
 				} else {
@@ -567,61 +566,41 @@ static const struct file_operations gf_fops = {
 #endif
 };
 
+static void fb_state_worker(struct work_struct *work)
+{
+	struct gf_dev *gf_dev = container_of(work, typeof(*gf_dev), fb_work);
+	if (!gf_dev->device_available)
+		return;
+ #if defined(GF_NETLINK_ENABLE)
+	{
+		char temp = gf_dev->fb_black ?
+			GF_NET_EVENT_FB_BLACK : GF_NET_EVENT_FB_UNBLACK;
+		sendnlmsg(&temp);
+	}
+#elif defined(GF_FASYNC)
+	if (gf_dev->async)
+		kill_fasync(&gf_dev->async, SIGIO, POLL_IN);
+#endif
+}
+
 static int goodix_fb_state_chg_callback(struct notifier_block *nb,
 					unsigned long val, void *data)
 {
-	struct gf_dev *gf_dev;
+	struct gf_dev *gf_dev = container_of(nb, typeof(*gf_dev), notifier);
 	struct fb_event *evdata = data;
-	unsigned int blank;
-
-#if defined(GF_NETLINK_ENABLE)
-		char temp = 0;
-#endif
+	int *blank = evdata->data;
 
 	if (val != FB_EARLY_EVENT_BLANK)
 		return 0;
-	pr_info("[info] %s go to the goodix_fb_state_chg_callback value = %d\n",
-		__func__, (int)val);
-	gf_dev = container_of(nb, struct gf_dev, notifier);
-	if (evdata && evdata->data && val == FB_EARLY_EVENT_BLANK && gf_dev) {
-		blank = *(int *)(evdata->data);
-		switch (blank) {
+	switch (*blank) {
 		case FB_BLANK_POWERDOWN:
-			if (gf_dev->device_available == 1) {
-				gf_dev->fb_black = 1;
-#if defined(GF_NETLINK_ENABLE)
-				temp = GF_NET_EVENT_FB_BLACK;
-				sendnlmsg(&temp);
-#elif defined (GF_FASYNC)
-				if (gf_dev->async) {
-					kill_fasync(&gf_dev->async, SIGIO,
-					POLL_IN);
-				}
-#endif
-		/*device unavailable */
-
-			}
-			break;
+			gf_dev->fb_black = 1;
+			schedule_work(&gf_dev->fb_work);
+		break;
 		case FB_BLANK_UNBLANK:
-			if (gf_dev->device_available == 1) {
-				gf_dev->fb_black = 0;
-#if defined(GF_NETLINK_ENABLE)
-				temp = GF_NET_EVENT_FB_UNBLACK;
-				sendnlmsg(&temp);
-#elif defined (GF_FASYNC)
-				if (gf_dev->async) {
-					kill_fasync(&gf_dev->async, SIGIO,
-						POLL_IN);
-				}
-#endif
-				/*device available */
-
-			}
-			break;
-		default:
-			pr_info("%s defalut\n", __func__);
-			break;
-		}
+			gf_dev->fb_black = 0;
+			schedule_work(&gf_dev->fb_work);
+		break;
 	}
 	return NOTIFY_OK;
 }
@@ -722,6 +701,7 @@ static int gf_probe(struct platform_device *pdev)
 		spi_clock_set(gf_dev, 4.8*1000*1000);
 #endif
 
+		INIT_WORK(&gf_dev->fb_work, fb_state_worker);
 		gf_dev->notifier = goodix_noti_block;
 		fb_register_client(&gf_dev->notifier);
 		gf_reg_key_kernel(gf_dev);

@@ -86,6 +86,7 @@ struct gf_dev {
 	struct fasync_struct *async;
 #endif
 	struct notifier_block notifier;
+	struct work_struct fb_work;
 	char device_available;
 	char fb_black;
 	struct wake_lock ttw_wl;
