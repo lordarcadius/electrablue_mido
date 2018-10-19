@@ -1,0 +1,13 @@
+import /init.performance_profiles.rc
+
+on property:sys.boot_completed=1
+    # allows FKUpdater to know this feature is supported
+    setprop fku.profiles 1
+
+    # I/O
+    setprop sys.io.scheduler maple
+
+on property:init.svc.qcom-post-boot=stopped
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor electron
+    write /sys/block/mmcblk1/queue/read_ahead_kb 128

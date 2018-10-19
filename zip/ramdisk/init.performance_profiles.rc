@@ -1,9 +1,5 @@
-on property:sys.boot_completed=1
-    # allows FKUpdater to know this feature is supported
-    setprop fku.profiles 1
-
 # Power saving profile
-on property:fku.perf.profile=0
+on property:fku.perf.profile=0 && property:init.svc.qcom-post-boot=stopped
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor relaxed
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 195000
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1689000
@@ -14,17 +10,13 @@ on property:fku.perf.profile=0
     write /sys/devices/system/cpu/cpufreq/relaxed/down_threshold_suspended 85
     write /sys/devices/system/cpu/cpufreq/relaxed/up_threshold 75
     write /sys/module/msm_performance/parameters/touchboost 0
-    write /sys/devices/soc/1c00000.qcom,kgsl-3d0/devfreq/1c00000.qcom,kgsl-3d0/governor msm-adreno-tz
-    write /sys/devices/soc/1c00000.qcom,kgsl-3d0/devfreq/1c00000.qcom,kgsl-3d0/min_freq 200000000
-    write /sys/devices/soc/1c00000.qcom,kgsl-3d0/devfreq/1c00000.qcom,kgsl-3d0/max_freq 510000000
-    write /sys/class/kgsl/kgsl-3d0/max_gpuclk 510000000
-    write /sys/block/mmcblk0/queue/scheduler noop
+    write /sys/class/kgsl/kgsl-3d0/devfreq/governor msm-adreno-tz
     write /sys/kernel/sched/arch_power 1
     write /sys/kernel/fast_charge/force_fast_charge 1
     write /sys/module/mdss_fb/parameters/backlight_dimmer 0
 
 # Balance (FK defaults)
-on property:fku.perf.profile=1
+on property:fku.perf.profile=1 && property:init.svc.qcom-post-boot=stopped
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor electron
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 195000
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 1958400
@@ -42,25 +34,13 @@ on property:fku.perf.profile=1
     write /sys/devices/system/cpu/cpufreq/electron/align_windows 1
     write /sys/devices/system/cpu/cpufreq/electron/max_freq_hysteresis 0
     write /sys/module/msm_performance/parameters/touchboost 1
-    write /sys/devices/soc/1c00000.qcom,kgsl-3d0/devfreq/1c00000.qcom,kgsl-3d0/governor msm-adreno-tz
-    write /sys/devices/soc/1c00000.qcom,kgsl-3d0/devfreq/1c00000.qcom,kgsl-3d0/min_freq 200000000
-    write /sys/devices/soc/1c00000.qcom,kgsl-3d0/devfreq/1c00000.qcom,kgsl-3d0/max_freq 725000000
-    write /sys/class/kgsl/kgsl-3d0/max_gpuclk 725000000
-    write /sys/block/mmcblk0/queue/scheduler maple
-    write /sys/block/mmcblk0/queue/read_ahead_kb 512
-    write /sys/block/mmcblk0/queue/iosched/writes_starved 4
-    write /sys/block/mmcblk0/queue/iosched/fifo_batch 16
-    write /sys/block/mmcblk0/queue/iosched/sync_read_expire 350
-    write /sys/block/mmcblk0/queue/iosched/sync_write_expire 550
-    write /sys/block/mmcblk0/queue/iosched/async_read_expire 250
-    write /sys/block/mmcblk0/queue/iosched/async_write_expire 450
-    write /sys/block/mmcblk0/queue/iosched/sleep_latency_multiple 10
+    write /sys/class/kgsl/kgsl-3d0/devfreq/governor msm-adreno-tz
     write /sys/kernel/sched/arch_power 1
     write /sys/kernel/fast_charge/force_fast_charge 1
     write /sys/module/mdss_fb/parameters/backlight_dimmer 1
 
 # Performance
-on property:fku.perf.profile=2
+on property:fku.perf.profile=2 && property:init.svc.qcom-post-boot=stopped
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor interactive
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq 195000
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq 2150400
@@ -75,11 +55,7 @@ on property:fku.perf.profile=2
     write /sys/devices/system/cpu/cpufreq/interactive/align_windows 0
     write /sys/devices/system/cpu/cpufreq/interactive/max_freq_hysteresis 0
     write /sys/module/msm_performance/parameters/touchboost 1
-    write /sys/devices/soc/1c00000.qcom,kgsl-3d0/devfreq/1c00000.qcom,kgsl-3d0/governor performance
-    write /sys/devices/soc/1c00000.qcom,kgsl-3d0/devfreq/1c00000.qcom,kgsl-3d0/min_freq 200000000
-    write /sys/devices/soc/1c00000.qcom,kgsl-3d0/devfreq/1c00000.qcom,kgsl-3d0/max_freq 725000000
-    write /sys/class/kgsl/kgsl-3d0/max_gpuclk 725000000
-    write /sys/block/mmcblk0/queue/scheduler deadline
+    write /sys/class/kgsl/kgsl-3d0/devfreq/governor performance
     write /sys/kernel/sched/arch_power 0
     write /sys/kernel/fast_charge/force_fast_charge 1
     write /sys/module/mdss_fb/parameters/backlight_dimmer 1
