@@ -42,7 +42,7 @@ dump_boot;
 # begin ramdisk changes
 
 # insert init.spectrum.rc in init.rc
-insert_line init.rc 'eb' after 'import /init.\${ro.zygote}.rc' 'import /init.eb.rc';
+insert_line init.rc "import /init.spectrum.rc" after "import /init.trace.rc" "import /init.spectrum.rc";
 
 # end ramdisk changes
 
