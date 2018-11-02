@@ -277,7 +277,7 @@ s32 gtp_i2c_write(struct i2c_client *client, u8 *buf, s32 len)
 {
 	struct i2c_msg msg;
 	s32 ret = -1;
-	s32 retries = 0;
+	//s32 retries = 0;
 
 	GTP_DEBUG_FUNC();
 
@@ -287,33 +287,11 @@ s32 gtp_i2c_write(struct i2c_client *client, u8 *buf, s32 len)
 	msg.buf   = buf;
 
 
-	while (retries < 5) {
-		ret = i2c_transfer(client->adapter, &msg, 1);
-		if (ret == 1)
-			break;
-		retries++;
-	}
-	if ((retries >= 5)) {
-	#if GTP_COMPATIBLE_MODE
-		struct goodix_ts_data *ts = i2c_get_clientdata(client);
-	#endif
+	ret = i2c_transfer(client->adapter, &msg, 1);
+    if (ret != 1)
+    {return -EINVAL;}
 
-	#if GTP_GESTURE_WAKEUP
-		if (DOZE_ENABLED == doze_status) {
-			return ret;
-		}
-	#endif
-		GTP_ERROR("I2C Write: 0x%04X, %d bytes failed, errcode: %d! Process reset.", (((u16)(buf[0] << 8)) | buf[1]), len-2, ret);
-	#if GTP_COMPATIBLE_MODE
-		if (CHIP_TYPE_GT9F == ts->chip_type) {
-			gtp_recovery_reset(client);
-		} else
-	#endif
-		{
-			gtp_reset_guitar(client, 10);
-		}
-	}
-	return ret;
+	   return ret;
 }
 
 /*******************************************************

@@ -197,24 +197,9 @@ int gtp_i2c_write(struct i2c_client *client, u8 *buf, int len)
 		.buf = buf,
 	};
 
-	for (retries = 0; retries < GTP_I2C_RETRY_5; retries++) {
-		ret = i2c_transfer(client->adapter, &msg, 1);
-		if (ret == 1)
-			break;
-		dev_err(&client->dev, "I2C retry: %d\n", retries + 1);
-	}
-	if (retries == GTP_I2C_RETRY_5) {
-		if (ts->pdata->slide_wakeup)
-			if (DOZE_ENABLED == doze_status)
-				return ret;
-
-		if (init_done)
-			gtp_reset_guitar(ts, 10);
-		else
-			dev_warn(&client->dev,
-				"gtp_reset_guitar exit init_done=%d:\n",
-				init_done);
-	}
+   ret = i2c_transfer(client->adapter, &msg, 1);
+	if (ret != 1)
+		return -EINVAL;
 	return ret;
 }
 
