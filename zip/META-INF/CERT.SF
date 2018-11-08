@@ -1,0 +1,43 @@
+Signature-Version: 1.0
+Created-By: 1.0 (Android SignApk)
+SHA1-Digest-Manifest: ICcJpwM5S4XMMd/Rxq9fVSaYnWI=
+
+Name: META-INF/com/google/android/updater-script
+SHA1-Digest-Manifest: Br6xNsbYLFIighT+FGsY/cB14YM=
+
+Name: nontreble/msm8953-qrd-sku3-mido.dtb
+SHA1-Digest-Manifest: lyplXq6l7weLNUZl5oZQEaiCT4k=
+
+Name: anykernel.sh
+SHA1-Digest-Manifest: jg46BDCFYZwQo/2a2zdYEdmmHsQ=
+
+Name: META-INF/com/google/android/update-binary
+SHA1-Digest-Manifest: eOOZC1sLMyxeHjEnBnUTc/kUjRg=
+
+Name: tools/busybox
+SHA1-Digest-Manifest: +xCmcOA8rS89XSf8fzomm0gFDIw=
+
+Name: banner
+SHA1-Digest-Manifest: DA7t528+O1tEZA+x/cAspymWkfk=
+
+Name: ramdisk/init.performance_profiles.rc
+SHA1-Digest-Manifest: YQiFbzptZkfTX0UvAbPHwrxXykk=
+
+Name: tools/mkbootimg
+SHA1-Digest-Manifest: mpL41++SdKVpI+OvZqrmHoSXrUY=
+
+Name: ramdisk/init.kud.rc
+SHA1-Digest-Manifest: sQfTpBCgMo7GNFxwoZPjkdkpVpA=
+
+Name: tools/unpackbootimg
+SHA1-Digest-Manifest: Bd+dCoj6gqSC0N3IhArQ/qAls+w=
+
+Name: treble/msm8953-qrd-sku3-mido.dtb
+SHA1-Digest-Manifest: wB9MZPzkgEnElUgvQWAQ5W5LtD0=
+
+Name: tools/ak2-core.sh
+SHA1-Digest-Manifest: 8M7NTOWWyhKAmRGqZPrt23Sndj0=
+
+Name: kernel/Image.gz
+SHA1-Digest-Manifest: CsBuBje8HySE9UAwmeQy26n4i4o=
+

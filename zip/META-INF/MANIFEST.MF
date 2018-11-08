@@ -1,0 +1,42 @@
+Manifest-Version: 1.0
+Created-By: 1.0 (Android SignApk)
+
+Name: META-INF/com/google/android/updater-script
+SHA1-Digest: surH1Bs4hR30JclyYkFBB7d7164=
+
+Name: nontreble/msm8953-qrd-sku3-mido.dtb
+SHA1-Digest: JFoKbBMtijEu+Sif9txt6PF3XMM=
+
+Name: anykernel.sh
+SHA1-Digest: 9q4TbYg5NBR3xy5Sm2bPql+W/GM=
+
+Name: META-INF/com/google/android/update-binary
+SHA1-Digest: QHGLPFIBxFPjb7U2EVSGDZL+2ik=
+
+Name: tools/busybox
+SHA1-Digest: PtPs8e7UJfvASQkDbAa0nKahnck=
+
+Name: banner
+SHA1-Digest: xYHk/jkYfJNEKKjOioFGHOhu6TU=
+
+Name: ramdisk/init.performance_profiles.rc
+SHA1-Digest: 0hSriaGlpvqhoVYnAyRwNLT/PBQ=
+
+Name: tools/mkbootimg
+SHA1-Digest: p4lY6iLI1uFoPXCqh2UwM9AwJk8=
+
+Name: ramdisk/init.kud.rc
+SHA1-Digest: w/vZTliZ2XWLhMnoF5zZp5GjJZk=
+
+Name: tools/unpackbootimg
+SHA1-Digest: cqIJx1KBytBCNmvrGV0bwsv7R+4=
+
+Name: treble/msm8953-qrd-sku3-mido.dtb
+SHA1-Digest: jGAitv+j6M6g+qViSziGTcyOxPk=
+
+Name: tools/ak2-core.sh
+SHA1-Digest: I460aCHz22AjL77uzmW+2b+NCWE=
+
+Name: kernel/Image.gz
+SHA1-Digest: SERz3lNwceTlqayZj26NYX+ImLI=
+
