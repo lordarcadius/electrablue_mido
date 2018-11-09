@@ -1,5 +1,6 @@
 # ElectraBlue Kernel Specific
 CONFIG_STATE_NOTIFIER=y
+CONFIG_BOEFFLA_WL_BLOCKER=y
 
 
 CONFIG_LOCALVERSION="-ElectraBlue-14.0-mido"
