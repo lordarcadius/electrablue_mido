@@ -1,3 +1,7 @@
+# ElectraBlue Kernel Specific
+CONFIG_STATE_NOTIFIER=y
+
+
 CONFIG_LOCALVERSION="-ElectraBlue-14.0-mido"
 CONFIG_LOCALVERSION_AUTO=n
 # CONFIG_USELIB is not set
