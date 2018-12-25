@@ -122,7 +122,7 @@ VENDOR="xiaomi"
 #ANDROID="OREO"
 DEVICE="mido"
 export KBUILD_BUILD_USER=vipul
-export KBUILD_BUILD_HOST=lordarcadius
+export KBUILD_BUILD_HOST=Wraith-Machine
 DATE=`date +"%Y%m%d-%H%M"`
 ZIP_NAME="$KERNEL"-"$VERSION"-"$DATE"-"$DEVICE"
 
