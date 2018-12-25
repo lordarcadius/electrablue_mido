@@ -9017,8 +9017,6 @@ static int ufshcd_devfreq_target(struct device *dev,
 	unsigned long irq_flags;
 	ktime_t start;
 	bool scale_up, sched_clk_scaling_suspend_work = false;
-	bool release_clk_hold = false;
-	unsigned long irq_flags;
 
 	if (!ufshcd_is_clkscaling_supported(hba))
 		return -EINVAL;
