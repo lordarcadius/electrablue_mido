@@ -71,7 +71,6 @@ if [ -f /tmp/anykernel/banner ]; then
   ui_print " ";
 fi;
 
-ui_print "$(file_getprop /tmp/anykernel/anykernel.sh kernel.string)";
 if [ -f /tmp/anykernel/version ]; then
   ui_print " ";
   while IFS='' read -r line || $bb [[ -n "$line" ]]; do
@@ -79,15 +78,19 @@ if [ -f /tmp/anykernel/version ]; then
   done < /tmp/anykernel/version;
   ui_print " ";
 fi;
+ui_print "=================================";
+ui_print "    __________________ ";
+ui_print "    ___  ____/___  __ )";
+ui_print "    __  __/   __  __  |";
+ui_print "    _  /___   _  /_/ / ";
+ui_print "    /_____/   /_____/  ";
 ui_print " ";
-ui_print "____________________________________________________________________ _____  ___________";
-ui_print "___  ____/__  /___  ____/_  ____/__  __/__  __ \__    |__  __ )__  / __  / / /__  ____/";
-ui_print "__  __/  __  / __  __/  _  /    __  /  __  /_/ /_  /| |_  __  |_  /  _  / / /__  __/   ";
-ui_print "_  /___  _  /___  /___  / /___  _  /   _  _, _/_  ___ |  /_/ /_  /___/ /_/ / _  /___   ";
-ui_print "/_____/  /_____/_____/  \____/  /_/    /_/ |_| /_/  |_/_____/ /_____/\____/  /_____/   ";
-ui_print " "
-ui_print "                                                                    K  E  R  N  E  L";
-ui_print " "
+ui_print "               K  E  R  N  E  L";
+ui_print "=================================";
+ui_print " By: Vipul Jha (LordArcadius)";
+ui_print " Version: 15.0";
+ui_print " Device: Redmi Note 4 (mido)";
+ui_print "=================================";
 ui_print " ";
 
 unmount_all;
@@ -97,28 +100,27 @@ mount /data 2>/dev/null;
 test -f /system/system/build.prop && root=/system;
 
 if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.devicecheck)" == 1 ]; then
-  ui_print "Checking device...";
+  # ui_print "Checking device...";
   device="$(getprop ro.product.device)";
   product="$(getprop ro.build.product)";
   for i in 1 2 3 4 5; do
     testname="$(file_getprop /tmp/anykernel/anykernel.sh device.name$i)";
     test "$testname" || break;
     if [ "$device" == "$testname" -o "$product" == "$testname" ]; then
-      ui_print "$testname";
+      # ui_print "$testname";
       match=1;
       break;
     fi;
   done;
-  ui_print " ";
   if [ "$match" != 1 ]; then
     abort "Unsupported device. Aborting...";
   fi;
-  ui_print "Checking Android version...";
+  # ui_print "Checking Android version...";
   romsdk="$(file_getprop /system/build.prop ro.build.version.sdk)";
   for i in 1 2; do
     testsdk="$(file_getprop /tmp/anykernel/anykernel.sh supported.sdk$i)";
     if [ "$romsdk" == "$testsdk" ]; then
-      ui_print "sdk$testsdk";
+      # ui_print "sdk$testsdk";
       matchsdk=1;
       break;
     fi;
@@ -147,7 +149,7 @@ savedpre="$LD_PRELOAD";
 unset LD_LIBRARY_PATH;
 unset LD_PRELOAD;
 
-ui_print "Installing...";
+ui_print "Installing ElectraBlue...";
 for i in $($bb --list); do
   $bb ln -s $bb /tmp/anykernel/bin/$i;
 done;
@@ -164,8 +166,8 @@ if [ $? != "0" ]; then
 fi;
 
 if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.modules)" == 1 ]; then
-  ui_print " ";
-  ui_print "Pushing modules...";
+ # ui_print " ";
+ # ui_print "Pushing modules...";
   mount -o rw,remount -t auto /system;
   mount -o rw,remount -t auto /vendor 2>/dev/null;
   cd /tmp/anykernel/modules;
@@ -201,5 +203,5 @@ test "$savedpre" && export LD_PRELOAD="$savedpre";
 unmount_all;
 
 ui_print " ";
+ui_print "Done! Reboot now.";
 ui_print " ";
-ui_print "Done!";
