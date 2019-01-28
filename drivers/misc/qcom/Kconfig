@@ -23,3 +23,12 @@ config MSM_MCU_TIME_SYNC
        help
          Say Y here if you want to get mcu and apq8009 data transfer
          with gpio.
+
+config AINUR_DTS_HW
+        bool "Ainur DTS hardware driver"
+        depends on SND_SOC_QDSP6V2
+        select SND_HWDEP
+        default n
+        help
+          Driver port of DTS' android audio hardware-processed
+          effect, which is processed upon the Hexagon DSP.
