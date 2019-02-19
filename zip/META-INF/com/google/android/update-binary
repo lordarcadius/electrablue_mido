@@ -88,7 +88,7 @@ ui_print " ";
 ui_print "               K  E  R  N  E  L";
 ui_print "=================================";
 ui_print " By: Vipul Jha (LordArcadius)";
-ui_print " Version: 15.0";
+ui_print " Version: 17.0";
 ui_print " Device: Redmi Note 4 (mido)";
 ui_print "=================================";
 ui_print " ";
