@@ -683,13 +683,12 @@ static int msm_isp_start_stats_stream(struct vfe_device *vfe_dev,
 			stream_cfg_cmd->num_streams);
 		return -EINVAL;
 	}
-	mutex_lock(&vfe_dev->buf_mgr->lock);
 
+	mutex_lock(&vfe_dev->buf_mgr->lock);
 	num_stats_comp_mask =
 		vfe_dev->hw_info->stats_hw_info->num_stats_comp_mask;
 	rc = vfe_dev->hw_info->vfe_ops.stats_ops.check_streams(
 		stats_data->stream_info);
-
 	if (rc < 0) {
 		mutex_unlock(&vfe_dev->buf_mgr->lock);
 		return rc;
