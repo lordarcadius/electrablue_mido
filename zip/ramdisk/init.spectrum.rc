@@ -40,14 +40,7 @@ on property:persist.spectrum.profile=0
 
     # Storage
     write /sys/block/mmcblk0/queue/scheduler bfq
-    write /sys/block/mmcblk0/queue/read_ahead_kb 512
-    write /sys/block/mmcblk0/queue/iosched/writes_starved 4
-    write /sys/block/mmcblk0/queue/iosched/fifo_batch 16
-    write /sys/block/mmcblk0/queue/iosched/sync_read_expire 350
-    write /sys/block/mmcblk0/queue/iosched/sync_write_expire 550
-    write /sys/block/mmcblk0/queue/iosched/async_read_expire 250
-    write /sys/block/mmcblk0/queue/iosched/async_write_expire 450
-    write /sys/block/mmcblk0/queue/iosched/sleep_latency_multiple 10
+    write /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk 0
 
     # Misc
     write /sys/kernel/fast_charge/force_fast_charge 1
@@ -78,6 +71,7 @@ on property:persist.spectrum.profile=1
 
     # Storage
     write /sys/block/mmcblk0/queue/scheduler bfq
+    write /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk 0
 
     # Misc
     write /sys/kernel/fast_charge/force_fast_charge 1
@@ -105,6 +99,7 @@ on property:persist.spectrum.profile=2
 
     # Storage
     write /sys/block/mmcblk0/queue/scheduler noop
+    write /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk 1
 
     # Misc
     write /sys/kernel/fast_charge/force_fast_charge 1
@@ -135,6 +130,7 @@ on property:persist.spectrum.profile=3
 
     # Storage
     write /sys/block/mmcblk0/queue/scheduler bfq
+    write /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk 0
 
     # Misc
     write /sys/kernel/fast_charge/force_fast_charge 1
