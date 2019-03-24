@@ -43,6 +43,5 @@ on property:init.svc.qcom-post-boot=stopped
 	write /sys/class/kgsl/kgsl-3d0/devfreq/governor msm-adreno-tz
 	chmod 0664 /sys/module/workqueue/parameters/power_efficient
         write /sys/module/workqueue/parameters/power_efficient Y
-        write /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk 0
         write /sys/kernel/fast_charge/force_fast_charge 1
     

@@ -40,7 +40,6 @@ on property:persist.spectrum.profile=0
 
     # Storage
     write /sys/block/mmcblk0/queue/scheduler bfq
-    write /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk 0
 
     # Misc
     write /sys/kernel/fast_charge/force_fast_charge 1
@@ -71,7 +70,6 @@ on property:persist.spectrum.profile=1
 
     # Storage
     write /sys/block/mmcblk0/queue/scheduler bfq
-    write /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk 0
 
     # Misc
     write /sys/kernel/fast_charge/force_fast_charge 1
@@ -99,8 +97,6 @@ on property:persist.spectrum.profile=2
 
     # Storage
     write /sys/block/mmcblk0/queue/scheduler noop
-    write /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk 1
-
     # Misc
     write /sys/kernel/fast_charge/force_fast_charge 1
     write /sys/module/mdss_fb/parameters/backlight_dimmer 0
@@ -130,8 +126,6 @@ on property:persist.spectrum.profile=3
 
     # Storage
     write /sys/block/mmcblk0/queue/scheduler bfq
-    write /sys/module/lowmemorykiller/parameters/enable_adaptive_lmk 0
-
     # Misc
     write /sys/kernel/fast_charge/force_fast_charge 1
     write /sys/module/mdss_fb/parameters/backlight_dimmer 1
