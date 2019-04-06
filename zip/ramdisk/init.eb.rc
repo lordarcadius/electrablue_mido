@@ -1,8 +1,6 @@
 
 
 import /init.performance_profiles.rc
-import /init.spectrum.rc
-
 on late-fs
     # boot time fs tune
     write /sys/block/sda/queue/iostats 0
