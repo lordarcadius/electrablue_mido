@@ -6337,6 +6337,7 @@ tSirRetStatus limSendDelBAInd( tpAniSirGlobal pMac,
     return eSIR_SUCCESS;
 
   returnAfterError:
+
     // Release buffer, if allocated
     if( NULL != pDelBAIndBuffer )
       palPktFree( pMac->hHdd,

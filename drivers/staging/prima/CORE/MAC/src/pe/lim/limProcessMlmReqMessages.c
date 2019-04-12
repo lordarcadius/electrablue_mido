@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2018 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2019 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -396,6 +396,43 @@ limChangeChannelWithCallback(tpAniSirGlobal pMac, tANI_U8 newChannel,
     return;
 }
 
+/**
+ * lim_is_spoofing_needed() - Check whether spoofing is needed for scan
+ * @mac: Pointer to mac
+ *
+ * Return: If spoofing is needed then return true else false.
+ */
+static bool lim_is_spoofing_needed(tpAniSirGlobal mac)
+{
+	/*
+	 * If mac spoofing response from firmware is not enabled
+	 * then disable spoofing.
+	 */
+	if (!mac->lim.isSpoofingEnabled)
+		return false;
+
+	/*
+	 * If all the octets of spoof mac-address are zero
+	 * then disable spoofing.
+	 */
+	if (vos_is_macaddr_zero((v_MACADDR_t *)&mac->lim.spoofMacAddr))
+		return false;
+
+	/*
+	 * If disableP2PMacSpoof is enabled and scan is P2P scan
+	 * then disable spoofing.
+	 */
+	if (mac->roam.configParam.disableP2PMacSpoofing &&
+	    mac->lim.gpLimMlmScanReq->p2pSearch)
+		return false;
+
+	/* Randomize NL (cfg80211) scan only when scan_randomize is set */
+	if (mac->lim.gpLimMlmScanReq->nl_scan)
+		return mac->lim.gpLimMlmScanReq->scan_randomize;
+
+	/* Randomize all other scans only when spoof_mac_oui is set */
+	return mac->lim.spoof_mac_oui;
+}
 
 /**
  * limContinuePostChannelScan()
@@ -456,23 +493,16 @@ void limContinuePostChannelScan(tpAniSirGlobal pMac)
          */
         do
         {
-            tSirMacAddr         gSelfMacAddr;
+            tSirMacAddr gSelfMacAddr;
+            bool        spoof = lim_is_spoofing_needed(pMac);
 
-            /* Send self MAC as src address if
-             * MAC spoof is not enabled OR
-             * spoofMacAddr is all 0 OR
-             * disableP2PMacSpoof is enabled and scan is P2P scan
-             * else use the spoofMac as src address
-             */
-            if ((pMac->lim.isSpoofingEnabled != TRUE) ||
-                (TRUE ==
-                vos_is_macaddr_zero((v_MACADDR_t *)&pMac->lim.spoofMacAddr)) ||
-                (pMac->roam.configParam.disableP2PMacSpoofing &&
-                pMac->lim.gpLimMlmScanReq->p2pSearch)) {
-                vos_mem_copy(gSelfMacAddr, pMac->lim.gSelfMacAddr, VOS_MAC_ADDRESS_LEN);
-            } else {
-                vos_mem_copy(gSelfMacAddr, pMac->lim.spoofMacAddr, VOS_MAC_ADDRESS_LEN);
-            }
+            if (spoof)
+                vos_mem_copy(gSelfMacAddr, pMac->lim.spoofMacAddr,
+                             VOS_MAC_ADDRESS_LEN);
+            else
+                vos_mem_copy(gSelfMacAddr, pMac->lim.gSelfMacAddr,
+                             VOS_MAC_ADDRESS_LEN);
+
             limLog(pMac, LOG1,
                  FL(" Mac Addr "MAC_ADDRESS_STR " used in sending ProbeReq number %d, for SSID %s on channel: %d"),
                       MAC_ADDR_ARRAY(gSelfMacAddr) ,i, pMac->lim.gpLimMlmScanReq->ssId[i].ssId, channelNum);
@@ -1763,7 +1793,7 @@ limMlmAddBss (
             pAddBssParams->rateSet.numRates = SIR_MAC_RATESET_EID_MAX;
     }
     vos_mem_copy(pAddBssParams->rateSet.rate,
-                 pMlmStartReq->rateSet.rate, pMlmStartReq->rateSet.numRates);
+                 pMlmStartReq->rateSet.rate, pAddBssParams->rateSet.numRates);
 
     pAddBssParams->nwType = pMlmStartReq->nwType;
 
@@ -1798,7 +1828,7 @@ limMlmAddBss (
     }
     vos_mem_copy(pAddBssParams->ssId.ssId,
                  pMlmStartReq->ssId.ssId,
-                 pMlmStartReq->ssId.length);
+                 pAddBssParams->ssId.length);
 
     pAddBssParams->bHiddenSSIDEn = pMlmStartReq->ssidHidden;
     limLog( pMac, LOGE, FL( "TRYING TO HIDE SSID %d" ),pAddBssParams->bHiddenSSIDEn);
@@ -4239,23 +4269,16 @@ limProcessPeriodicProbeReqTimer(tpAniSirGlobal pMac)
          */
         do
         {
-            tSirMacAddr         gSelfMacAddr;
+            tSirMacAddr gSelfMacAddr;
+            bool        spoof = lim_is_spoofing_needed(pMac);
 
-            /* Send self MAC as src address if
-             * MAC spoof is not enabled OR
-             * spoofMacAddr is all 0 OR
-             * disableP2PMacSpoof is enabled and scan is P2P scan
-             * else use the spoofMac as src address
-             */
-            if ((pMac->lim.isSpoofingEnabled != TRUE) ||
-                (TRUE ==
-                vos_is_macaddr_zero((v_MACADDR_t *)&pMac->lim.spoofMacAddr)) ||
-                (pMac->roam.configParam.disableP2PMacSpoofing &&
-                pMac->lim.gpLimMlmScanReq->p2pSearch)) {
-                vos_mem_copy(gSelfMacAddr, pMac->lim.gSelfMacAddr, VOS_MAC_ADDRESS_LEN);
-            } else {
-                vos_mem_copy(gSelfMacAddr, pMac->lim.spoofMacAddr, VOS_MAC_ADDRESS_LEN);
-            }
+            if (spoof)
+                vos_mem_copy(gSelfMacAddr, pMac->lim.spoofMacAddr,
+                             VOS_MAC_ADDRESS_LEN);
+            else
+                vos_mem_copy(gSelfMacAddr, pMac->lim.gSelfMacAddr,
+                             VOS_MAC_ADDRESS_LEN);
+
             limLog( pMac, LOG1, FL("Mac Addr used in Probe Req is :"MAC_ADDRESS_STR),
                                    MAC_ADDR_ARRAY(gSelfMacAddr));
 
@@ -5261,8 +5284,8 @@ ePhyChanBondState limGet11ACPhyCBState(tpAniSirGlobal pMac, tANI_U8 channel, tAN
         return htSecondaryChannelOffset;
     }
 
-    if ( (htSecondaryChannelOffset 
-                 == PHY_DOUBLE_CHANNEL_LOW_PRIMARY)
+    if ( htSecondaryChannelOffset 
+                 == PHY_DOUBLE_CHANNEL_LOW_PRIMARY
        )
     {
         if ((channel + 2 ) == peerCenterChan )
@@ -5276,8 +5299,8 @@ ePhyChanBondState limGet11ACPhyCBState(tpAniSirGlobal pMac, tANI_U8 channel, tAN
                        FL("Invalid Channel Number = %d Center Chan = %d "),
                                  channel, peerCenterChan);
     }
-    if ( (htSecondaryChannelOffset 
-                 == PHY_DOUBLE_CHANNEL_HIGH_PRIMARY)
+    if ( htSecondaryChannelOffset 
+                 == PHY_DOUBLE_CHANNEL_HIGH_PRIMARY
        )
     {
         if ((channel - 2 ) == peerCenterChan )

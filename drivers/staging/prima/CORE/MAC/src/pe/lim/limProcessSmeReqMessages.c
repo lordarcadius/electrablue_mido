@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2018 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2019 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -1541,6 +1541,8 @@ __limProcessSmeScanReq(tpAniSirGlobal pMac, tANI_U32 *pMsgBuf)
                    pScanReq->max_chntime_btc_esco;
           pMlmScanReq->dot11mode = pScanReq->dot11mode;
           pMlmScanReq->p2pSearch = pScanReq->p2pSearch;
+          pMlmScanReq->scan_randomize = pScanReq->scan_randomize;
+          pMlmScanReq->nl_scan = pScanReq->nl_scan;
 
           //Store the smeSessionID and transaction ID for later use.
           pMac->lim.gSmeSessionId = pScanReq->sessionId;
@@ -2643,6 +2645,16 @@ __limProcessSmeDisassocReq(tpAniSirGlobal pMac, tANI_U32 *pMsgBuf)
         case eLIM_BT_AMP_STA_ROLE:
             switch (psessionEntry->limSmeState)
             {
+		/* cleanup FT session and proceed with disconnect
+		 * if received disconnect from supplicant when roaming
+		 * and lim state is eLIM_SME_WT_REASSOC_STATE. As the
+		 * FT session would have already created but is not cleaned.
+		 * This will prevent sending duplicate add bss request,
+		 * if we try to disconnect and connect to the same AP
+		 */
+		case eLIM_SME_WT_REASSOC_STATE:
+			limFTCleanup(pMac);
+			/* Fall through */
                 case eLIM_SME_ASSOCIATED_STATE:
                 case eLIM_SME_LINK_EST_STATE:
                     limLog(pMac, LOG1, FL("Rcvd SME_DISASSOC_REQ while in "
@@ -3854,7 +3866,7 @@ __limHandleSmeStopBssRequest(tpAniSirGlobal pMac, tANI_U32 *pMsgBuf)
        )
     {
         tSirMacAddr   bcAddr = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-        if ((stopBssReq.reasonCode == eSIR_SME_MIC_COUNTER_MEASURES))
+        if (stopBssReq.reasonCode == eSIR_SME_MIC_COUNTER_MEASURES)
             // Send disassoc all stations associated thru TKIP
             __limCounterMeasures(pMac,psessionEntry);
         else
@@ -5592,6 +5604,8 @@ __limProcessSmeSpoofMacAddrRequest(tpAniSirGlobal pMac, tANI_U32 *pMsgBuf)
 
    vos_mem_copy(pMac->lim.spoofMacAddr, pSmeReq->macAddr, VOS_MAC_ADDRESS_LEN);
 
+   pMac->lim.spoof_mac_oui = pSmeReq->spoof_mac_oui;
+
    limLog( pMac, LOG1, FL("Recieved Spoofed Mac Addr request with Addr:"
                 MAC_ADDRESS_STR), MAC_ADDR_ARRAY(pMac->lim.spoofMacAddr) );
 
@@ -5664,7 +5678,7 @@ void lim_send_chan_switch_action_frame(tpAniSirGlobal mac_ctx,
    switch_count = session_entry->gLimChannelSwitch.switchCount;
    dph_node_array_ptr = session_entry->dph.dphHashTable.pDphNodeArray;
 
-   for (i = 0; i < (mac_ctx->lim.maxStation + 1); i++) {
+   for (i = 0; i < session_entry->dph.dphHashTable.size; i++) {
         psta = dph_node_array_ptr + i;
         if (!(psta && psta->added))
             continue;
@@ -5795,7 +5809,7 @@ static void lim_process_sme_channel_change_request(tpAniSirGlobal mac_ctx,
    max_tx_pwr = cfgGetRegulatoryMaxTransmitPower(mac_ctx,
                      ch_change_req->new_chan);
 
-   if ((max_tx_pwr == WDA_MAX_TXPOWER_INVALID)) {
+   if (max_tx_pwr == WDA_MAX_TXPOWER_INVALID) {
        limLog(mac_ctx, LOGE, FL("Invalid Request/max_tx_pwr"));
        return;
    }
