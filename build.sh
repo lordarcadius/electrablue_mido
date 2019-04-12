@@ -62,22 +62,12 @@ make_kernel()
 make_zip()
 {
 		cd $REPACK_DIR
-		mkdir kernel
-		mkdir treble
-		mkdir nontreble
-		cp $KERNEL_DIR/arch/arm64/boot/dts/qcom/msm8953-qrd-sku3-mido-nontreble.dtb $REPACK_DIR/nontreble/
-		cp $KERNEL_DIR/arch/arm64/boot/dts/qcom/msm8953-qrd-sku3-mido-treble.dtb $REPACK_DIR/treble/
-		cp $KERNEL_DIR/arch/arm64/boot/Image.gz $REPACK_DIR/kernel/
+		cp $KERNEL_DIR/arch/arm64/boot/Image.gz-dtb $REPACK_DIR/
 		zip -r9 `echo $ZIP_NAME`.zip *
 		cp *.zip $OUT
 		rm *.zip
-		rm -rf kernel
-		rm -rf treble
-		rm -rf nontreble
 		cd $KERNEL_DIR
-		rm arch/arm64/boot/Image.gz
-		#rm arch/arm64/boot/dts/qcom/msm8953-qrd-sku3-mido-nontreble.dtb
-		#rm arch/arm64/boot/dts/qcom/msm8953-qrd-sku3-mido-treble.dtb
+		rm arch/arm64/boot/Image.gz-dtb
 }
 
 show_output()
@@ -127,7 +117,7 @@ DATE=`date +"%Y%m%d-%H%M"`
 ZIP_NAME="$KERNEL"-"$VERSION"-"$DATE"-"$DEVICE"
 
 # Check old build
-if [ -f arch/arm64/boot/"Image.gz" ]; then
+if [ -f arch/arm64/boot/"Image.gz-dtb" ]; then
 echo "$(tput setaf 4)Previous build found! Creating Zip.$(tput sgr0)"
 	make_zip
 	show_output
@@ -169,7 +159,7 @@ do
 case "$dchoice" in
 	y|Y )
 		make_kernel
-		if [ -f arch/arm64/boot/"Image.gz" ]; then
+		if [ -f arch/arm64/boot/"Image.gz-dtb" ]; then
 		make_zip
 		show_output
 		else
