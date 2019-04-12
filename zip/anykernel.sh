@@ -4,24 +4,22 @@
 ## AnyKernel setup
 # begin properties
 properties() { '
-kernel.string=lordarcadius@xda-developers
+kernel.string=ElectraBlue Kernel for Redmi Note 4(X)
 do.devicecheck=1
 do.modules=0
 do.cleanup=1
 do.cleanuponabort=1
 device.name1=mido
 device.name2=redmi note 4
-device.name3=Rendi Nude 4
-device.name4=Redmi Note 4
-device.name5=Redmi Note 4x
-supported.sdk1=27
-supported.sdk2=28
+device.name3=Redmi Note 4
+device.name4=Redmi Note 4x
+supported.versions=8.1.0 - 9
 '; } # end properties
 
 # shell variables
-block=/dev/block/platform/soc/7824900.sdhci/by-name/boot;
+block=/dev/block/bootdevice/by-name/boot;
 is_slot_device=0;
-ramdisk_compression=gz;
+ramdisk_compression=auto;
 
 
 ## AnyKernel methods (DO NOT CHANGE)
@@ -32,9 +30,15 @@ ramdisk_compression=gz;
 ## AnyKernel file attributes
 # set permissions/ownership for included ramdisk files
 chmod -R 750 $ramdisk/*;
-chmod -R 755 $ramdisk/sbin;
 chown -R root:root $ramdisk/*;
 
+## Treble Check
+is_treble=$(file_getprop /system/build.prop "ro.treble.enabled");
+if [ ! "$is_treble" -o "$is_treble" == "false" ]; then
+  ui_print " ";
+  ui_print "ElectraBlue Kernel only supports Treble ROMS!";
+  exit 1;
+fi;
 
 ## AnyKernel install
 dump_boot;

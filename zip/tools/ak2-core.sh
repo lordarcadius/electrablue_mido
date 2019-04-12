@@ -1,4 +1,6 @@
 ## AnyKernel methods (DO NOT CHANGE)
+# osm0sis @ xda-developers
+
 # set up extracted files and directories
 ramdisk=/tmp/anykernel/ramdisk;
 bin=/tmp/anykernel/tools;
@@ -18,7 +20,7 @@ ui_print() { echo -e "ui_print $1\nui_print" > $OUTFD; }
 contains() { test "${1#*$2}" != "$1" && return 0 || return 1; }
 
 # file_getprop <file> <property>
-file_getprop() { grep "^$2=" "$1" | cut -d= -f2; }
+file_getprop() { grep "^$2=" "$1" | cut -d= -f2-; }
 
 # reset anykernel directory
 reset_ak() {
@@ -213,11 +215,18 @@ flash_boot() {
     if [ -f *-oslevel ]; then
       oslvl=`cat *-oslevel`;
     fi;
+    if [ -f *-headerversion ]; then
+      hdrver=`cat *-headerversion`;
+    fi;
     if [ -f *-second ]; then
       second=`ls *-second`;
       second="--second $split_img/$second";
       secondoff=`cat *-secondoff`;
       secondoff="--second_offset $secondoff";
+    fi;
+    if [ -f *-recoverydtbo ]; then
+      recoverydtbo=`ls *-recoverydtbo`;
+      recoverydtbo="--recovery_dtbo $split_img/$recoverydtbo";
     fi;
     if [ -f *-hash ]; then
       hash=`cat *-hash`;
@@ -273,7 +282,7 @@ flash_boot() {
   elif [ -f "$bin/pxa-mkbootimg" ]; then
     $bin/pxa-mkbootimg --kernel $kernel --ramdisk $rd $second --cmdline "$cmdline" --board "$board" --base $base --pagesize $pagesize --kernel_offset $kerneloff --ramdisk_offset $ramdiskoff $secondoff --tags_offset "$tagsoff" --unknown $unknown $dtb --output boot-new.img;
   else
-    $bin/mkbootimg --kernel $kernel --ramdisk $rd $second --cmdline "$cmdline" --board "$board" --base $base --pagesize $pagesize --kernel_offset $kerneloff --ramdisk_offset $ramdiskoff $secondoff --tags_offset "$tagsoff" --os_version "$osver" --os_patch_level "$oslvl" $hash $dtb --output boot-new.img;
+    $bin/mkbootimg --kernel $kernel --ramdisk $rd $second $recoverydtbo --cmdline "$cmdline" --board "$board" --base $base --pagesize $pagesize --kernel_offset $kerneloff --ramdisk_offset $ramdiskoff $secondoff --tags_offset "$tagsoff" --os_version "$osver" --os_patch_level "$oslvl" --header_version "$hdrver" $hash $dtb --output boot-new.img;
   fi;
   if [ $? != 0 ]; then
     ui_print " "; ui_print "Repacking image failed. Aborting..."; exit 1;
@@ -348,10 +357,11 @@ backup_file() { test ! -f $1~ && cp $1 $1~; }
 # restore_file <file>
 restore_file() { test -f $1~ && mv -f $1~ $1; }
 
-# replace_string <file> <if search string> <original string> <replacement string>
+# replace_string <file> <if search string> <original string> <replacement string> <scope>
 replace_string() {
+  test "$5" == "global" && local scope=g;
   if [ -z "$(grep "$2" $1)" ]; then
-    sed -i "s;${3};${4};" $1;
+    sed -i "s;${3};${4};${scope}" $1;
   fi;
 }
 
@@ -569,6 +579,8 @@ case $block in
             ui_print " "; ui_print "Unable to determine mtd $block partition. Aborting..."; exit 1;
           fi;
           target=/dev/mtd/$mtd;
+        elif [ -e /dev/block/by-name/$part ]; then
+          target=/dev/block/by-name/$part;
         elif [ -e /dev/block/bootdevice/by-name/$part ]; then
           target=/dev/block/bootdevice/by-name/$part;
         elif [ -e /dev/block/platform/*/by-name/$part ]; then
