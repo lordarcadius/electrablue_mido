@@ -20,13 +20,13 @@ struct boost_dev {
 	unsigned long boost_freq;
 	unsigned long max_boost_expires;
 	unsigned long max_boost_jiffies;
+	bool disable;
 	spinlock_t lock;
 };
 
 struct df_boost_drv {
 	struct boost_dev devices[DEVFREQ_MAX];
 	struct notifier_block fb_notif;
-	bool screen_awake;
 };
 
 static struct df_boost_drv *df_boost_drv_g __read_mostly;
@@ -36,7 +36,7 @@ static void __devfreq_boost_kick(struct boost_dev *b)
 	unsigned long flags;
 
 	spin_lock_irqsave(&b->lock, flags);
-	if (!b->df) {
+	if (!b->df || b->disable) {
 		spin_unlock_irqrestore(&b->lock, flags);
 		return;
 	}
@@ -52,9 +52,6 @@ void devfreq_boost_kick(enum df_device device)
 	if (!d)
 		return;
 
-	if (!d->screen_awake)
-		return;
-
 	__devfreq_boost_kick(d->devices + device);
 }
 
@@ -64,7 +61,7 @@ static void __devfreq_boost_kick_max(struct boost_dev *b,
 	unsigned long flags, new_expires;
 
 	spin_lock_irqsave(&b->lock, flags);
-	if (!b->df) {
+	if (!b->df || b->disable) {
 		spin_unlock_irqrestore(&b->lock, flags);
 		return;
 	}
@@ -86,9 +83,6 @@ void devfreq_boost_kick_max(enum df_device device, unsigned int duration_ms)
 	struct df_boost_drv *d = df_boost_drv_g;
 
 	if (!d)
-		return;
-
-	if (!d->screen_awake)
 		return;
 
 	__devfreq_boost_kick_max(d->devices + device, duration_ms);
@@ -136,6 +130,20 @@ static unsigned long devfreq_abs_min_freq(struct boost_dev *b)
 		b->abs_min_freq = 0;
 
 	return b->abs_min_freq;
+}
+
+static void devfreq_disable_boosting(struct df_boost_drv *d, bool disable)
+{
+	int i;
+
+	for (i = 0; i < DEVFREQ_MAX; i++) {
+		struct boost_dev *b = d->devices + i;
+		unsigned long flags;
+
+		spin_lock_irqsave(&b->lock, flags);
+		b->disable = disable;
+		spin_unlock_irqrestore(&b->lock, flags);
+	}
 }
 
 static void devfreq_unboost_all(struct df_boost_drv *d)
@@ -243,14 +251,16 @@ static int fb_notifier_cb(struct notifier_block *nb,
 	struct df_boost_drv *d = container_of(nb, typeof(*d), fb_notif);
 	struct fb_event *evdata = data;
 	int *blank = evdata->data;
+	bool screen_awake;
 
 	/* Parse framebuffer blank events as soon as they occur */
 	if (action != FB_EARLY_EVENT_BLANK)
 		return NOTIFY_OK;
 
 	/* Boost when the screen turns on and unboost when it turns off */
-	d->screen_awake = *blank == FB_BLANK_UNBLANK;
-	if (d->screen_awake) {
+	screen_awake = *blank == FB_BLANK_UNBLANK;
+	devfreq_disable_boosting(d, !screen_awake);
+	if (screen_awake) {
 		int i;
 
 		for (i = 0; i < DEVFREQ_MAX; i++)
@@ -269,9 +279,6 @@ static void devfreq_boost_input_event(struct input_handle *handle,
 {
 	struct df_boost_drv *d = handle->handler->private;
 	int i;
-
-	if (!d->screen_awake)
-		return;
 
 	for (i = 0; i < DEVFREQ_MAX; i++)
 		__devfreq_boost_kick(d->devices + i);
