@@ -17,7 +17,6 @@
 #include <linux/cpufreq.h>
 #include <linux/fb.h>
 #include <linux/input.h>
-#include <linux/moduleparam.h>
 #include <linux/slab.h>
 
 /* Available bits for boost_drv state */
@@ -25,15 +24,6 @@
 #define INPUT_BOOST		(1U << 1)
 #define WAKE_BOOST		(1U << 2)
 #define MAX_BOOST		(1U << 3)
-
-static __read_mostly unsigned int input_boost_freq = CONFIG_INPUT_BOOST_FREQ;
-module_param(input_boost_freq, uint, 0644);
-
-static __read_mostly unsigned int input_boost_ms = CONFIG_INPUT_BOOST_DURATION_MS;
-module_param(input_boost_ms, uint, 0644);
-
-static __read_mostly unsigned int wake_boost_enabled = 1;
-module_param(wake_boost_enabled, uint, 0644);
 
 struct boost_drv {
 	struct workqueue_struct *wq;
@@ -138,9 +128,6 @@ void cpu_input_boost_kick_max(unsigned int duration_ms)
 
 static void input_boost_worker(struct work_struct *work)
 {
-	if (unlikely(input_boost_ms == 0))
-		return;
-
 	struct boost_drv *b = container_of(work, typeof(*b), input_boost);
 
 	if (!cancel_delayed_work_sync(&b->input_unboost)) {
@@ -149,7 +136,7 @@ static void input_boost_worker(struct work_struct *work)
 	}
 
 	queue_delayed_work(b->wq, &b->input_unboost,
-		msecs_to_jiffies(input_boost_ms));
+		msecs_to_jiffies(CONFIG_INPUT_BOOST_DURATION_MS));
 }
 
 static void input_unboost_worker(struct work_struct *work)
@@ -206,7 +193,7 @@ static int cpu_notifier_cb(struct notifier_block *nb,
 	 * unboosting, set policy->min to the absolute min freq for the CPU.
 	 */
 	if (state & INPUT_BOOST) {
-		policy->min = min(policy->max, input_boost_freq);
+		policy->min = min(policy->max, (unsigned int)CONFIG_INPUT_BOOST_FREQ);
 	} else {
 		policy->min = policy->cpuinfo.min_freq;
 	}
@@ -223,9 +210,6 @@ static int fb_notifier_cb(struct notifier_block *nb,
 
 	/* Parse framebuffer blank events as soon as they occur */
 	if (action != FB_EARLY_EVENT_BLANK)
-		return NOTIFY_OK;
-
-	if (unlikely(!wake_boost_enabled))
 		return NOTIFY_OK;
 
 	/* Boost when the screen turns on and unboost when it turns off */
