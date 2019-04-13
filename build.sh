@@ -107,7 +107,7 @@ echo -e "$RESET"
 
 
 # Kernel Details
-VERSION="19.0"
+VERSION="20.0"
 VENDOR="xiaomi"
 #ANDROID="OREO"
 DEVICE="mido"
