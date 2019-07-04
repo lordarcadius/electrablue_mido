@@ -37,7 +37,7 @@ DEFCONFIG="mido_defconfig"
 
 # Paths
 KERNEL_DIR=$PWD
-REPACK_DIR=$KERNEL_DIR/zip
+REPACK_DIR=/home/vipul/kernels/AnyKernel3
 ZIMAGE_DIR=$KERNEL_DIR/arch/arm64/boot
 OUT=$KERNEL_DIR/out
 
@@ -66,6 +66,7 @@ make_zip()
 		zip -r9 `echo $ZIP_NAME`.zip *
 		cp *.zip $OUT
 		rm *.zip
+		rm Image.gz-dtb
 		cd $KERNEL_DIR
 		rm arch/arm64/boot/Image.gz-dtb
 }
