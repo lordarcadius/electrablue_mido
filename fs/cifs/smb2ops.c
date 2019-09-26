@@ -1207,6 +1207,12 @@ smb21_set_oplock_level(struct cifsInodeInfo *cinode, __u32 oplock,
 		return;
 
 	cinode->oplock = 0;
+	
+	/* Check if the server granted an oplock rather than a lease */
+	if (oplock & SMB2_OPLOCK_LEVEL_EXCLUSIVE)
+		return smb2_set_oplock_level(cinode, oplock, epoch,
+					     purge_cache);
+
 	if (oplock & SMB2_LEASE_READ_CACHING_HE) {
 		cinode->oplock |= CIFS_CACHE_READ_FLG;
 		strcat(message, "R");
