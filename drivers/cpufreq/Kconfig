@@ -268,7 +268,7 @@ config CPU_FREQ_GOV_CONSERVATIVEX
 	tristate "'conservativex’ cpufreq governor"
 	depends on CPU_FREQ	
 	help
-           ‘bioshock’ – Mixing Lionheart and ConservativeX
+           ‘Conservativex’ – Improved Conservative
 
 config CPU_WAKE_BOOST
 	bool "CPU wake boost"
