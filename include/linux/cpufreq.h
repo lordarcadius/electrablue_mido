@@ -522,7 +522,11 @@ extern struct cpufreq_governor cpufreq_gov_electron;
 #elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_CONSERVATIVEX)
 extern struct cpufreq_governor cpufreq_gov_conservativex;
 #define CPUFREQ_DEFAULT_GOVERNOR        (&cpufreq_gov_conservativex)
+#elif defined(CONFIG_CPU_FREQ_DEFAULT_GOV_BIOSHOCK)
+extern struct cpufreq_governor cpufreq_gov_bioshock;
+#define CPUFREQ_DEFAULT_GOVERNOR (&cpufreq_gov_bioshock)
 #endif
+
 
 /*********************************************************************
  *                     FREQUENCY TABLE HELPERS                       *

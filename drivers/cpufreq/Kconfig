@@ -218,6 +218,18 @@ config CPU_FREQ_GOV_INTERACTIVE
 	  For details, take a look at linux/Documentation/cpu-freq.
 
 	  If in doubt, say N.
+	  
+config CPU_FREQ_DEFAULT_GOV_BIOSHOCK
+		bool "BioShock"
+		select CPU_FREQ_GOV_BIOSHOCK
+		help
+			Use the CPUFreq governor 'BioShock' as default.
+			
+config CPU_FREQ_GOV_BIOSHOCK
+	tristate "'bioshock' cpufreq bioshock"
+	depends on CPU_FREQ
+	help
+		'bioshock' – Mixing Lionheart and ConservitiveX
 
 config CPU_FREQ_GOV_CONSERVATIVE
 	tristate "'conservative' cpufreq governor"
