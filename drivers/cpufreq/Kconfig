@@ -204,6 +204,18 @@ config CPU_FREQ_GOV_ONDEMAND
 	  For details, take a look at linux/Documentation/cpu-freq.
 
 	  If in doubt, say N.
+	  
+config CPU_FREQ_DEFAULT_GOV_BIOSHOCK
+		bool "BioShock"
+		select CPU_FREQ_GOV_BIOSHOCK
+		help
+			Use the CPUFreq governor 'BioShock' as default.
+			
+config CPU_FREQ_GOV_BIOSHOCK
+	tristate "'bioshock' cpufreq bioshock"
+	depends on CPU_FREQ
+	help
+		'bioshock' – Mixing Lionheart and ConservitiveX
 
 config CPU_FREQ_GOV_INTERACTIVE
 	bool "'interactive' cpufreq policy governor"
@@ -219,17 +231,28 @@ config CPU_FREQ_GOV_INTERACTIVE
 
 	  If in doubt, say N.
 	  
-config CPU_FREQ_DEFAULT_GOV_BIOSHOCK
-		bool "BioShock"
-		select CPU_FREQ_GOV_BIOSHOCK
-		help
-			Use the CPUFreq governor 'BioShock' as default.
-			
-config CPU_FREQ_GOV_BIOSHOCK
-	tristate "'bioshock' cpufreq bioshock"
-	depends on CPU_FREQ
+config CPU_FREQ_DEFAULT_GOV_CONSERVATIVEX
+	bool “Conservativex”
+	select CPU_FREQ_GOV_CONSERVATIVEX
 	help
-		'bioshock' – Mixing Lionheart and ConservitiveX
+	Use the CPUFreq governor ‘CONSERVATIVEX’ as default.
+
+config CPU_FREQ_GOV_CONSERVATIVEX
+	tristate "'conservativex’ cpufreq governor"
+	depends on CPU_FREQ	
+	help
+           ‘Conservativex’ – Improved Conservative
+           
+config CPU_FREQ_DEFAULT_GOV_DARKNESS
+	bool “Darkness”
+	select CPU_FREQ_GOV_DARKNESS
+	help
+	Use the CPUFreq governor ‘DARKNESS’ as default.
+
+config CPU_FREQ_GOV_DARKNESS
+	tristate "'Darkness' cpufreq governor"
+	depends on CPU_FREQ	
+	help
 
 config CPU_FREQ_GOV_CONSERVATIVE
 	tristate "'conservative' cpufreq governor"
@@ -269,18 +292,6 @@ config CPU_FREQ_GOV_SCHED
 	  If in doubt, say N.
 
 comment "CPU frequency scaling drivers"
-
-config CPU_FREQ_DEFAULT_GOV_CONSERVATIVEX
-	bool “Conservativex”
-	select CPU_FREQ_GOV_CONSERVATIVEX
-	help
-	Use the CPUFreq governor ‘CONSERVATIVEX’ as default.
-
-config CPU_FREQ_GOV_CONSERVATIVEX
-	tristate "'conservativex’ cpufreq governor"
-	depends on CPU_FREQ	
-	help
-           ‘Conservativex’ – Improved Conservative
 
 config CPU_WAKE_BOOST
 	bool "CPU wake boost"
