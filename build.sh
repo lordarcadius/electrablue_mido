@@ -71,6 +71,15 @@ make_zip()
 		rm arch/arm64/boot/Image.gz-dtb
 }
 
+make_dir()
+{
+		if [ -d out ]; then
+		echo ""
+		else
+		mkdir out
+		fi
+}
+
 show_output()
 {
 		echo -e "${GREEN}"
@@ -159,6 +168,7 @@ while read -p "$(tput setaf 6)Do you want to build? (y/n):$(tput sgr0) " dchoice
 do
 case "$dchoice" in
 	y|Y )
+		make_dir
 		make_kernel
 		if [ -f arch/arm64/boot/"Image.gz-dtb" ]; then
 		make_zip
